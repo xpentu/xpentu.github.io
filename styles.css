@@ -45,6 +45,63 @@ button:hover {
     background-color: #666;
 }
 
+.projects {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.project-card {
+    display: block;
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: white;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+a.project-card:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+    transform: translateY(-1px);
+}
+
+.project-card.disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.project-status {
+    display: inline-block;
+    font-size: 0.65em;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ccc;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+}
+
+.project-status.live {
+    background: #2e7d32;
+    color: #d9ffdc;
+}
+
+.project-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.project-desc {
+    font-size: 0.85em;
+    color: #bbb;
+}
+
 .split-background {
     background: url('./img/low.jpg') no-repeat center center; 
     background-size: cover;
