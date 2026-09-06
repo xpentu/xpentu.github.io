@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>*~ Rank Climber 2005 ~*</title>
+<style>
+  body {
+    background-color: #000066;
+    font-family: "Comic Sans MS", "Papyrus", cursive, fantasy;
+    color: #FFFF00;
+    text-align: center;
+    margin: 0;
+    padding: 10px;
+    overflow-x: hidden;
+  }
+  marquee.title {
+    font-size: 36px;
+    font-weight: bold;
+    color: #FF00FF;
+  }
+  .blink { animation: blinker 1s linear infinite; }
+  @keyframes blinker { 50% { opacity: 0; } }
+  .container {
+    border: 6px solid #C0C0C0;
+    background: #008080;
+    padding: 20px;
+    margin: 10px auto;
+    max-width: 700px;
+  }
+  #score {
+    font-size: 28px;
+    color: #00FF00;
+    background: black;
+    border: 4px solid #808080;
+    padding: 10px;
+    font-family: "Courier New", monospace;
+  }
+  #rankName {
+    font-size: 22px;
+    color: #FFFFFF;
+    margin: 8px 0;
+    letter-spacing: 1px;
+  }
+  #rankBox {
+    background: black;
+    border: 4px solid #808080;
+    display: inline-block;
+    padding: 15px;
+    margin: 10px 0;
+  }
+  #rankFloat {
+    display: inline-block;
+    animation: floaty 2.4s ease-in-out infinite;
+  }
+  @keyframes floaty {
+    0%   { transform: translateY(0px) rotate(-6deg); }
+    50%  { transform: translateY(-12px) rotate(6deg); }
+    100% { transform: translateY(0px) rotate(-6deg); }
+  }
+  #diamondBtn {
+    width: 140px;
+    height: 140px;
+    cursor: pointer;
+    image-rendering: pixelated;
+    transition: transform 0.08s ease-out;
+  }
+  #progressOuter {
+    width: 400px;
+    margin: 10px auto;
+    border: 3px solid #808080;
+    background: #333333;
+    height: 24px;
+  }
+  #progressInner {
+    height: 100%;
+    background: #FFCC00;
+    width: 0%;
+  }
+  table.stats {
+    margin: 15px auto;
+    border: 3px double #FFFF00;
+    background: #400040;
+    color: #FFFFFF;
+    font-size: 13px;
+  }
+  table.stats td { padding: 4px 10px; border: 1px dashed #808080; }
+  .shopSection {
+    text-align: left;
+    background: #003333;
+    border: 3px solid #FFFF00;
+    margin: 10px auto;
+    padding: 8px;
+    max-width: 640px;
+  }
+  .shopSection h3 { text-align: center; color: #00FFFF; margin: 4px 0; }
+  .shopRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #005555;
+    border: 2px solid #808080;
+    padding: 5px 8px;
+    margin: 4px 0;
+    font-size: 12px;
+  }
+  .shopRow.disabled { opacity: 0.5; }
+  .shopRowInfo { text-align: left; }
+  .shopRowName { font-weight: bold; color: #FFFF00; }
+  .shopRowDesc { color: #CCCCCC; font-size: 11px; }
+  .shopRowOwned { color: #00FF00; font-size: 11px; }
+  button.buyBtn {
+    background: #FFCC00;
+    border: 3px solid #806600;
+    font-weight: bold;
+    font-family: "Comic Sans MS", cursive;
+    padding: 5px 8px;
+    cursor: pointer;
+    font-size: 12px;
+    white-space: nowrap;
+    margin-left: 8px;
+  }
+  button.buyBtn:disabled {
+    background: #666666;
+    border-color: #333333;
+    cursor: not-allowed;
+  }
+  #log {
+    text-align: left;
+    background: black;
+    color: #00FF00;
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+    height: 130px;
+    overflow-y: scroll;
+    border: 3px solid #808080;
+    padding: 6px;
+    margin-top: 10px;
+  }
+  .warn { color: #FF0000; font-weight: bold; }
+  #hitcounter {
+    background: black;
+    color: #FF0000;
+    font-family: "Courier New", monospace;
+    border: 2px solid #FFFF00;
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 12px;
+  }
+  a.webring { color: #00FFFF; font-size: 11px; }
+  .badge {
+    display:inline-block; background:red; color:yellow; font-size:10px;
+    padding:2px 4px; border:1px dashed yellow;
+  }
+  #popup {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #660066;
+    border: 5px solid #FFFF00;
+    color: white;
+    padding: 22px;
+    font-size: 18px;
+    z-index: 999;
+    display: none;
+    max-width: 440px;
+  }
+  #popup button, #battlePopup button {
+    display:block; margin: 15px auto 0; padding: 6px 16px; font-size:16px;
+    background:#00FF00; border:3px solid #007700; cursor:pointer; font-weight:bold;
+  }
+  #battlePopup {
+    position: fixed;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #222222;
+    border: 5px solid #FFFF00;
+    color: white;
+    padding: 22px;
+    font-size: 16px;
+    z-index: 1000;
+    display: none;
+    max-width: 460px;
+    text-align: center;
+  }
+  .versusRow {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 14px 0;
+  }
+  .versusSide { width: 45%; }
+  .versusSide img { width: 80px; height: 80px; image-rendering: pixelated; }
+  .versusSide svg { width: 100px; }
+  .versusScore {
+    font-family: "Courier New", monospace;
+    font-size: 26px;
+    color: #00FF00;
+    background: black;
+    border: 2px solid #808080;
+    margin-top: 6px;
+  }
+  #clickBattleBtn {
+    background: #FF0000;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 14px 30px;
+    border: 4px solid #880000;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  #battleTimer {
+    font-size: 20px;
+    color: #FFFF00;
+    font-family: "Courier New", monospace;
+  }
+  #rhythmPopup {
+    position: fixed;
+    top: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111111;
+    border: 5px solid #FFFF00;
+    color: white;
+    padding: 16px;
+    z-index: 1000;
+    display: none;
+    text-align: center;
+    width: 420px;
+  }
+  #rhythmPopup h3 { color: #FF00FF; margin: 4px 0; }
+  #rhythmPopup .sub { font-size: 12px; color: #CCCCCC; margin-bottom: 8px; }
+  #rhythmStats {
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    color: #00FF00;
+    margin-top: 6px;
+  }
+  #highway {
+    position: relative;
+    width: 360px;
+    height: 300px;
+    margin: 0 auto;
+    background: #000000;
+    border: 3px solid #444444;
+    overflow: hidden;
+  }
+  .lane {
+    position: absolute;
+    top: 0;
+    width: 90px;
+    height: 100%;
+    border-left: 1px dashed #333333;
+  }
+  .lane:nth-child(1) { left: 0px; }
+  .lane:nth-child(2) { left: 90px; }
+  .lane:nth-child(3) { left: 180px; }
+  .lane:nth-child(4) { left: 270px; }
+  .hitzone {
+    position: absolute;
+    bottom: 10px;
+    left: 5px;
+    width: 80px;
+    height: 30px;
+    border: 3px solid #666666;
+    background: #222222;
+    font-size: 9px;
+    color: #999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: "Courier New", monospace;
+  }
+  .hitzone.active { border-color: #FFFF00; background: #444400; }
+  .note {
+    position: absolute;
+    top: -30px;
+    width: 80px;
+    height: 24px;
+    background: #FFCC00;
+    border: 2px solid #806600;
+  }
+  .note.lane0 { background: #FF4444; border-color: #880000; }
+  .note.lane1 { background: #44FF44; border-color: #008800; }
+  .note.lane2 { background: #4488FF; border-color: #002288; }
+  .note.lane3 { background: #FF44FF; border-color: #880088; }
+  #rhythmStartBtn {
+    margin-top: 10px; padding: 8px 20px; font-size: 15px;
+    background: #FFCC00; border: 3px solid #806600; cursor: pointer; font-weight: bold;
+  }
+  #endingScreen {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #000000;
+    color: #FF0000;
+    z-index: 2000;
+    display: none;
+    text-align: center;
+    padding-top: 60px;
+    font-family: "Courier New", monospace;
+  }
+  #endingScreen h1 { font-size: 34px; }
+  #endingScreen p { font-size: 16px; max-width: 500px; margin: 14px auto; color: #CCCCCC; }
+  #endingScreen img { width: 150px; margin-top: 20px; image-rendering: pixelated; }
+  #endingScreen button {
+    margin-top: 30px; padding: 10px 24px; font-size: 16px;
+    background: #FFCC00; border: 3px solid #806600; cursor: pointer; font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<marquee class="title" behavior="alternate">*** RANK CLIMBER: PROVE YOU GOT SKILL ***</marquee>
+<p class="blink" style="color:#FF0000; font-size:18px;">CLICK ON YOUR RANK EMBLEM FOR GRINDING MMR AND RANKING UP</p>
+
+<div id="hitcounter">VISITOR COUNTING: <span id="hits">00001337</span> -- IS BEST VIEW WITH NETSCAPE NAVIGATOR AT 800x600</div>
+
+<div class="container">
+  <div id="rankBox">
+    <div id="rankFloat"><img id="diamondBtn" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNjoyNSswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNjoyNSswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTY6MjUrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6Yzg2ODRjNWEtYmFlYy03ZTRjLWE2ZmYtN2MzMGNiMzRkYjBmIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6NzYyNmE3ZTItZjZhYy0wMzQyLTlmM2ItOTdlYzQ0MmY4MjYzIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6MDhiMmEzNTYtMjNlZi1jODRjLWI5YmMtOGU2YmZmMWFhNzVjIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MDhiMmEzNTYtMjNlZi1jODRjLWI5YmMtOGU2YmZmMWFhNzVjIiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE2OjI1KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpjODY4NGM1YS1iYWVjLTdlNGMtYTZmZi03YzMwY2IzNGRiMGYiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTY6MjUrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+n64vmAAAAexJREFUOI3Fk99LU3EYxp/v2ZnTuR2X82ckUxO0G1nlylBaQlA31lUWoaSoRF0MryKISsw/IKQu1266DULzokJIECXLaUTkjyC0ie44tnk2d447P96urA1WFyn0wHvzwufh5XnflxER9iNuX/RBGPA5u1vBq5DCt2G2lgJgMLQtcFwAjtoABNffDfTIlxEuGelizrphmCwvwDgdu9uXsLP5ACnRC+uhbvDCb4CIflX482jPlN9H8vpcMRGB1CgoHQGpMVB00Uff3xKtvbmTybDMLfh9niWNtz+qLCt63th2HdWey4CSAEBYC756bSurmbUYyvnChgtn9pgsg45GNnOsytEaE+N6eaUNfXeHYLULULajeWOjE/GWi9fOyjvxXnf7wK2cGVjMUDUjrqs8UFJOWB5/DDWhYzEm3RwLygW1Tu3jakTpc7cP5A7xSitfkSTjVKEds83n3GDJFUw8FR3+aYzwAt59mJzEpw3DeyODybqDE6e94/WC66XneBMcxUfAldDRdAXmWxqAe/1oI6v2bNdkfM1ksjKA1Iz0nHOebRaJml16/2NZvB/eUFHqkp7kFchy6Fuqsyo/UVfzUE/lNgCDJnVCXzgZYKGpbnNaB7Mx0bDlL6wbmmQKz3QdXg0pGKQ/TPAP+v/P9BP+QOMmiQMekwAAAABJRU5ErkJggg==" onclick="clickRank()"></div>
+  </div>
+  <div id="rankName">BRONZE I</div>
+  <div id="progressOuter"><div id="progressInner"></div></div>
+  <div style="font-size:12px; color:#CCCCCC;"><span id="mmrCurrent">0</span> / <span id="mmrNeeded">50</span> MMR for go next rank</div>
+
+  <div id="score">MMR: 0</div>
+  <br>
+  <div>MMR for each click: <span id="perClick">1</span> | MMR for each sec: <span id="perSec">0</span></div>
+
+  <table class="stats">
+    <tr><td>Total Click:</td><td id="totalClicks">0</td></tr>
+    <tr><td>Lifetime MMR Earn:</td><td id="lifetime">0</td></tr>
+    <tr><td>How Many Rank Up:</td><td id="milestones">0</td></tr>
+    <tr><td>Time You Got Rob:</td><td id="betrayals" class="warn">0</td></tr>
+  </table>
+
+  <div>
+    <span class="badge">NEW</span> <span class="badge">RANK SEASON 1</span> <span class="badge">100% IS LEGIT</span>
+  </div>
+
+  <div class="shopSection">
+    <h3>CLICK TRAINING</h3>
+    <div id="clickShopRows"></div>
+  </div>
+
+  <div class="shopSection">
+    <h3>AUTO GRINDER</h3>
+    <div id="autoShopRows"></div>
+  </div>
+
+  <div class="shopSection">
+    <h3>MISC</h3>
+    <div id="miscShopRows"></div>
+  </div>
+
+  <div id="log">&gt; Welcome for Ranked Season 1. Placement match is complete now. Good luck, have much fun.<br></div>
+</div>
+
+<p style="font-size:11px; color:#C0C0C0;">
+  <a class="webring" href="#">&lt;&lt; PREV SITE</a> |
+  <a class="webring" href="#">ROCKET RANK WEBRING</a> |
+  <a class="webring" href="#">NEXT SITE &gt;&gt;</a>
+</p>
+<p style="font-size:10px; color:#808080;">This page is best view at 800x600 resolution. Still under construction from 2005. <a href="#" onclick="if(confirm('erase your save and start over?')) resetSave(); return false;" style="color:#666666;">(reset save)</a></p>
+
+<div id="popup">
+  <div id="popupText"></div>
+  <button onclick="closePopup()">OK</button>
+</div>
+
+<div id="battlePopup">
+  <div id="battleTitle" style="font-size:20px; color:#FFFF00; font-weight:bold;">BANDIT CHALLENGE</div>
+  <div id="battleIntro">A bandit is pull up with shiny car and challenge you for clickoff of your rank.</div>
+  <div class="versusRow">
+    <div class="versusSide">
+      <img id="battlePlayerIcon" src="" />
+      <div>YOU</div>
+      <div class="versusScore" id="playerScore">0</div>
+      <div style="font-size:10px; color:#00FFFF;" id="autoAssistLine"></div>
+    </div>
+    <div class="versusSide">
+      <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+<rect x="10" y="30" width="80" height="18" fill="#FFD700" stroke="black" stroke-width="2"/>
+<polygon points="25,30 35,15 65,15 75,30" fill="#FFD700" stroke="black" stroke-width="2"/>
+<rect x="38" y="18" width="10" height="10" fill="#88CCFF" stroke="black" stroke-width="1"/>
+<rect x="52" y="18" width="10" height="10" fill="#88CCFF" stroke="black" stroke-width="1"/>
+<circle cx="28" cy="48" r="8" fill="#222222" stroke="black" stroke-width="2"/>
+<circle cx="72" cy="48" r="8" fill="#222222" stroke="black" stroke-width="2"/>
+<rect x="8" y="34" width="6" height="6" fill="#FF0000"/>
+<rect x="86" y="34" width="6" height="6" fill="#FF0000"/>
+</svg>
+      <div id="banditLabel">THE BANDIT</div>
+      <div class="versusScore" id="banditScore">0</div>
+    </div>
+  </div>
+  <div id="battleTimer">Ready...</div>
+  <button id="clickBattleBtn" onclick="battleClick()" style="display:none;">CLICK!</button>
+  <button id="battleStartBtn" onclick="startBattle()">START THE CLICKOFF</button>
+</div>
+
+<div id="rhythmPopup">
+  <h3 id="rhythmTitle">CAR CONTROL SHOWDOWN</h3>
+  <div class="sub" id="rhythmSub">Hit control in time for song so you hold your line. Is 4K, no assist.</div>
+  <div id="highway">
+    <div class="lane"><div class="hitzone" id="hz0">DRIFT<br>LEFT</div></div>
+    <div class="lane"><div class="hitzone" id="hz1">BOOST</div></div>
+    <div class="lane"><div class="hitzone" id="hz2">BRAKE</div></div>
+    <div class="lane"><div class="hitzone" id="hz3">DRIFT<br>RIGHT</div></div>
+  </div>
+  <div id="rhythmStats">HITS: <span id="rhythmHits">0</span> / <span id="rhythmTotal">0</span></div>
+  <button id="rhythmStartBtn" onclick="startRhythmBattle()">START SONG</button>
+</div>
+
+<div id="endingScreen">
+  <h1>*** GAME OVER ***</h1>
+  <p id="endingText"></p>
+  <img id="endingIcon" src="" />
+  <br>
+  <button onclick="resetSave()">NEW GAME +</button>
+</div>
+
+<div id="devToggleArea" style="text-align:center; margin: 18px 0 6px;">
+  <a href="#" onclick="toggleDevBox(); return false;" style="font-size:10px; color:#444444; text-decoration:none;">.</a>
+</div>
+<div id="devBox" style="display:none; max-width:260px; margin: 0 auto 20px; background:#111111; border:2px solid #555555; padding:8px; font-size:11px; color:#999999; text-align:center;">
+  <div id="devLockedArea">
+    <div style="margin-bottom:4px;">enter code for special mode</div>
+    <input id="devPassInput" type="password" style="width:110px;" onkeydown="if(event.key==='Enter') tryDevUnlock();">
+    <button onclick="tryDevUnlock()" style="font-size:10px;">go</button>
+    <div id="devPassMsg" style="color:#FF6666; font-size:10px; margin-top:4px;"></div>
+  </div>
+  <div id="devUnlockedArea" style="display:none; text-align:left;">
+    <div style="text-align:center; color:#00FF00; font-weight:bold; margin-bottom:6px;">DEV MODE IS ON</div>
+    <div style="margin-bottom:4px;">Set MMR: <input id="devSetScore" type="number" style="width:80px;"> <button onclick="devApplyScore()">set</button></div>
+    <div style="margin-bottom:4px;">Set Lifetime MMR: <input id="devSetLifetime" type="number" style="width:80px;"> <button onclick="devApplyLifetime()">set</button></div>
+    <div style="margin-bottom:4px;">Jump Rank: <select id="devRankSelect"></select> <button onclick="devApplyRank()">go</button></div>
+    <div style="margin-bottom:4px;"><label><input type="checkbox" id="devGodMode" onchange="devToggleGod()"> god mode (win every battle auto)</label></div>
+    <div style="margin-bottom:4px;"><button onclick="devMaxGrinders()">max out all auto grinder</button></div>
+    <div style="margin-bottom:4px;"><button onclick="devMaxClickers()">max out all click training</button></div>
+  </div>
+</div>
+
+<script>
+const RANKS = {"bronze-1": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNjoyNSswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNjoyNSswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTY6MjUrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6Yzg2ODRjNWEtYmFlYy03ZTRjLWE2ZmYtN2MzMGNiMzRkYjBmIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6NzYyNmE3ZTItZjZhYy0wMzQyLTlmM2ItOTdlYzQ0MmY4MjYzIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6MDhiMmEzNTYtMjNlZi1jODRjLWI5YmMtOGU2YmZmMWFhNzVjIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MDhiMmEzNTYtMjNlZi1jODRjLWI5YmMtOGU2YmZmMWFhNzVjIiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE2OjI1KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpjODY4NGM1YS1iYWVjLTdlNGMtYTZmZi03YzMwY2IzNGRiMGYiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTY6MjUrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+n64vmAAAAexJREFUOI3Fk99LU3EYxp/v2ZnTuR2X82ckUxO0G1nlylBaQlA31lUWoaSoRF0MryKISsw/IKQu1266DULzokJIECXLaUTkjyC0ie44tnk2d447P96urA1WFyn0wHvzwufh5XnflxER9iNuX/RBGPA5u1vBq5DCt2G2lgJgMLQtcFwAjtoABNffDfTIlxEuGelizrphmCwvwDgdu9uXsLP5ACnRC+uhbvDCb4CIflX482jPlN9H8vpcMRGB1CgoHQGpMVB00Uff3xKtvbmTybDMLfh9niWNtz+qLCt63th2HdWey4CSAEBYC756bSurmbUYyvnChgtn9pgsg45GNnOsytEaE+N6eaUNfXeHYLULULajeWOjE/GWi9fOyjvxXnf7wK2cGVjMUDUjrqs8UFJOWB5/DDWhYzEm3RwLygW1Tu3jakTpc7cP5A7xSitfkSTjVKEds83n3GDJFUw8FR3+aYzwAt59mJzEpw3DeyODybqDE6e94/WC66XneBMcxUfAldDRdAXmWxqAe/1oI6v2bNdkfM1ksjKA1Iz0nHOebRaJml16/2NZvB/eUFHqkp7kFchy6Fuqsyo/UVfzUE/lNgCDJnVCXzgZYKGpbnNaB7Mx0bDlL6wbmmQKz3QdXg0pGKQ/TPAP+v/P9BP+QOMmiQMekwAAAABJRU5ErkJggg==", "bronze-2": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNjoxMiswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNjoxMiswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTY6MTIrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6YTkxNjAxNTEtYTY4NC04MjRjLWFhNmItMThiZmY0YjE3ZjM0IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6NTgxNjgwNTYtOGVjYi05ZjQxLTljNjItZmNjMmViMTAxOWRkIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6YTFkZDA1MzUtNDU1MS1kNDQ2LTkwMTktZjJlYzRhYTdjYzE1IiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6YTFkZDA1MzUtNDU1MS1kNDQ2LTkwMTktZjJlYzRhYTdjYzE1IiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE2OjEyKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDphOTE2MDE1MS1hNjg0LTgyNGMtYWE2Yi0xOGJmZjRiMTdmMzQiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTY6MTIrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+8YSNxgAAAehJREFUOI1j/P//PwMlgIki3dQwgAVT6B8Dw9Nj3gw/PjUwMDIrMzCxfGBgYHjEwMQ0m0FYYykDtyR+F/x4fqn169tnWxj4Zc4wiGkHMQjKtDFw8j1h+PNjPsOXZwsZ/v/AbcDj4/NDdy/srvrFJmnMIKKXycAjceD3j58vv3z5/oxBSCXy37d3kf+fHC9D1sOIHAsTElRf/mHmWqgkJ1dm7hHGIK2iynDh0N4JP3/915WQk5/JziPG9PfDk6nStsnCWA3w12B8qSLJY8LB9OWxqbECg7a6FsOyvbe+62go5f36xeSroW9a9vrN2+lumVMdsQYiEwMD07//X1+rqrMwXL7ygKFrxYPrgtwMZ4V/vdp74vGvGQLMj5OvPPzB4JaJIxaCrVh+MbIzpnDx/Ht27BXDAp73DLxe6kyMh+5/Wv/8GcOJUweuMZ98/t+yFFcYPJgrlnrvNNesl99+MvwT/HDXVfOH5vNnDJZzDzAcNNZgNLp1h3Hqzc8Mz9ec/huM1QCG13EMX89+O/T98ktbLv1vdowiv35d3PbzxO/XPxgY+X/f+/7rK7OK+FdFxcK//7EbwDCJ4efrWwyMVz7Ws35iCPrx/rsG49+/TP+4/718wfrusAjDpUi+G58YGKoRehiHfmYCABZX190hM5MFAAAAAElFTkSuQmCC", "bronze-3": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNjowNCswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNjowNCswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTY6MDQrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6YWMyMjYxNTQtNDg4ZC1hYTRkLTgwODMtZjRkM2ZkNWY2NTE2IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6MmZlZmZjMzQtYWM5Mi1jNjRmLWIwODYtNGFmMGVmMjY0NzI5IiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6N2Q1NjVhNDgtZDgxMS1hNjQ0LWJjYWQtY2RkMjczZTYwNGFhIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6N2Q1NjVhNDgtZDgxMS1hNjQ0LWJjYWQtY2RkMjczZTYwNGFhIiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE2OjA0KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDphYzIyNjE1NC00ODhkLWFhNGQtODA4My1mNGQzZmQ1ZjY1MTYiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTY6MDQrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+yUf7SQAAAfBJREFUOI3FU89rknEcft73VVPLemc6naSZORBHTGJNiiJC2NsGXXZphxUMVoz+g3XqNGJFHXZs16JLdIgFbQ1qbNMQCUobTJzNNSfv9io6zVdf3++3s+B7iAU9t8/heXh+8GEopTgK2COx/4WAru3KrwN6I0CpgJr0CAzjBaEMQAowGGfhDL+CztRGYdo6IBVAlf1qLpHmzPxn6M0/QIkeatOBQ/EWeK8AQ9ciTp3RiNAs4ueX5QfFFn+TWtwT0l7O21JaVqq3TMMzOIBm7R4aknaEpdnxK2mxygwNj37IxusvxFLZ5fEF0ixRpnvDI+OcqXtDlpKTJ7r75ztGuGpn9gcD3LWQ/+Tuaqb5zeu0rbjczqJCuCFrz7n71yMja4l49ECYmrN1dBDshe28UyXLsdL7/QbScqW2k8ps23kDu5IS1xcYKdkf2zg4JkzNdS4xMWP/upNVPVuFQ2vwgno5maV3Nzdxye/D7beryLAENbMRxaVt6unooO+G+4mjoXsZCpoy/IAYs0er84HjSl9AqG753PXXHxfomOus/rn2jPI7IJV4g+TaaLOna4bmyw+VigzGVX9czZM7BaW0S4O/wqHhhoYAAKURhxp99pT7bYmwp/lFjlNpq6xGOEIykuPTWM78HRf9VFvgb/H/n+kPtIXfBC8iwUsAAAAASUVORK5CYII=", "silver-1": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxMzoyOCswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxMzoyOCswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTM6MjgrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ZWNlNGViMjctM2I3Yi00MzQyLTgxYWUtZjlkZTQ4OTdhYzIyIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6ZTZiYjkxNTktOGNlNS05YzQ5LWFjYWQtNDk5NjU4Yzg1MTRhIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6NmNjYTcwZjAtNTZmOC1hYjRhLWJkOTktMDY1YzVlZmFmMzg2IiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NmNjYTcwZjAtNTZmOC1hYjRhLWJkOTktMDY1YzVlZmFmMzg2IiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjEzOjI4KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDplY2U0ZWIyNy0zYjdiLTQzNDItODFhZS1mOWRlNDg5N2FjMjIiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTM6MjgrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+xpEGdwAAAfBJREFUOI3Fk09oE0EUxr/Z3fRgKerB1MYsLdJLlRYEc1XopaAXqz168KLS4q1IEUpQCD32JB68WUSK4KVtDuJBrH9iIkmhNptt16RpJGlSQZNsTDbu7LwepNtI9CAVfDAwfN+832PevGFEhIOEdKDsfwFQ9rd7V2GwbTtMJLoAti+CPKyDnQfwAwA86Php/KYH9znnY4qi3Gr1HMeZYMQU2SOf++U0EYGIwLkNzm1vPp8n27a69vTWxTkvCuGMEAlXc3sghI3l5VeLhUJhtlb7bppmpaWMAACFhIhw7jwAmOu4gPn5p5OJxMpx1e+brJS/obRdRLVShmmWQSSwvqEvaSlNte3m81KpNNMGiEQig5uZzM5W9jNi0Tiy2S3U6yaaVgOb6Uzf3KPHI93d3gu6rn8xDONMG+DG9ZvXmCSdWEslR0/290NWFLx98w6fjDSCd++9rla+vqyZlZ2FhcU7quq71AYYGDiF8fGJq416/Ulvr4rBoSH4/X2IxRJjKV3zXx69MhwKzbyQGJs2jHSz7RWE44CI8HF1Napp2kMiYg7nR4PBaQqHl0LxeDwwNXW7amzo+BB97+a5c+A4AowBkiQdyeVy67Isr1mWdbhY3D7d0+N7ltSSw4GzgYvHvN4Vq2Ghs/PQHwfpr+L/f6ZdZzUaS3/05+0AAAAASUVORK5CYII=", "silver-2": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxMzoyMCswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxMzoyMCswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTM6MjArMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ZDI1OTg2NmYtYjM0My0yYzRkLTg3Y2UtZDJhOTM2MTAxZjdjIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6NjU3OWQ4MmMtNjQ4Mi1kNjQ0LWFlNDEtZjA0Mzk4NzcxYTk3IiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6NjA2MjU5NTUtNDExZi05YTQwLWExYTAtZmNmODdkMGM1Y2E3IiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NjA2MjU5NTUtNDExZi05YTQwLWExYTAtZmNmODdkMGM1Y2E3IiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjEzOjIwKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpkMjU5ODY2Zi1iMzQzLTJjNGQtODdjZS1kMmE5MzYxMDFmN2MiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTM6MjArMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+sQBfOgAAAg1JREFUOI3VU0FoE1EQnW2M2oRCBDEQKkJVtGpCtOSkpWA96cGC0pPkIoW2odZCT4o91fQmGA8etAcbKoKrOdWDumlrDoayTRpJulEbsqmxkN0u6cbabjf7/3iITSPxVi8ODAzMvDfMmxkGEWE31rAr9L8g2LMTbo/CACHGG8MgRxiGQUQAhoEcAJjMe81dAKBVqpjfMMQ/XNf1B6UfJaSUDhqGPohIvIj4YkvTsGzoLEEDDFqu1teAKSCSpmg0iuvr6kmkpJpTFAUR6TVCSBwRHbUNazQgEAqFOEmSOQBT+ufGBgAApFKLn1ZWvicAmFeKsmopldTHfxUxGJy4NTsz63G7Wi+tFSUwmwGy2a/tLMs6T59qdUejH6eyoiio6hoVRfFOHcHcXLylUChomYwIS0sZWJUlGB29/+H4sRZ/QZKaJiefXz7rdnbxPH8w/Tl9vo6gr7fvttPpmuLjC4Hmw0ch8OjJcCq5CG3n2u729/vyDod9bH6eb3739v0Ft+vMlZ3lVdUvg6qqlkDg4bflXM7d3X0dwxznGX86frWjox0TCwno7LyIY35/73SYq98CJRQQEQRB8I+M3MPgxDMBEff19NzEmemw7zX7cmhgwLeVz+chFotVccz2L1BKKjM1mCyRSES0Wq1ysVg8IMuSzWazJZOppMd7w3vikN3+RdvchP2NjZWz+/+f6ReMaEwKM8ySAQAAAABJRU5ErkJggg==", "silver-3": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxMzoxMCswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxMzoxMCswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTM6MTArMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6YWNlZWU4MTUtOGExMC04YTRlLWI3YTctMDY1NDI0OWQ0ZDNjIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6ZjRkZWNmYzQtMTY3YS0xZjQ4LWI2ZGYtNjRmOTIyYmE5MjMzIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6ZTQxODY2NmItMTYxOC1jNDQ4LTkzOTktNTAxMDcyY2NlZjQzIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZTQxODY2NmItMTYxOC1jNDQ4LTkzOTktNTAxMDcyY2NlZjQzIiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjEzOjEwKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDphY2VlZTgxNS04YTEwLThhNGUtYjdhNy0wNjU0MjQ5ZDRkM2MiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTM6MTArMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+gHFSygAAAiBJREFUOI3Fk19IU3EUx8+9u1utsTR7mAyUJsRAc0KTcgU+BSGyXnzZCoJsseg9EoJAoWYRhUU9DNrA/mA2NsOsh6axF7smlC2zudW8K3aR7bZd6WF3/u69pwdrsdZTBh04cA6c8/1yPnAoRITNBL2p7X8hwFS3CAAUKIryWJZJG01rMqqqtgDAV4qi8jod4wQAucobEauSEDJUKBQQEa8Qsl5QFPkWIkakUgllmQQQFdjIjflKIZMyIMpMLBZDUSzuF8Xi8Ww2O4+IIIoip6rqeUVRXv5uWGFAUwCR8MSzZHJZrKurn0ulUmf0ep0r/eljiM9m1yiKusjz/D4ik74/QgyFH50YGx8/1NNz2Pzl88ruclmalImcH3sY6jObTR3x+MJtrZY5lUomr2YynLdGYP7VW0uxWAB2ljUE7wQGDQb9Jd/w5aUWS9NQLp/rFgShaDI1BqLR6V3p9Er3L+4/bomEI3BvdNRp62hHv9/vuDEy4ujstOOLmWkYOHc2lkgsQjDoH/R4PCgIq7UM7Pa94HK7J0/29y9ardb6NwuvZ4d9vj0sOzeQ5fltudUCXL9280Jba+uxd/H3tQyamptBwzDQ2+u8OzX15GlXl2Ot3Wbbmlj+4HO7jt6PzjyfOHDQwTudRx5otVsqAtTPX1AVFYACoGl6O8uyS4SsawRBaJQk6RshROY4bofXe9rSsLOBk0oSGI3GaoG/jf//TN8B0QE6FSxyzAUAAAAASUVORK5CYII=", "gold-1": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNDo1MyswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNDo1MyswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTQ6NTMrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6M2NkY2YwMWQtNTAyYi04NjQzLWI5YzctNTQ0MWM1YzY3ODY3IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6MGY3NjBmYTUtODA2Ni05MDRmLWJhNTAtOTBkZTYwMDc3Mjc3IiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6ZWIyZTQ0YzUtZGNlNS0wMzQzLWI1NmEtMWUyN2MzZTc0NzA0IiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZWIyZTQ0YzUtZGNlNS0wMzQzLWI1NmEtMWUyN2MzZTc0NzA0IiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE0OjUzKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDozY2RjZjAxZC01MDJiLTg2NDMtYjljNy01NDQxYzVjNjc4NjciIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTQ6NTMrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+H6DvoQAAAbhJREFUOI3Vk89LFAEUx78zs7vDru7qljvltDv+3tCDIVFoB0NIBP+CDuW5Qzch6LCXBBEED+YpIYg6qtCKIlQgGIiiYh1ChNwtt9Yf024ji+06zHy9CDUyQmCXHjweD973w/c9eAJJnCfEc6n/BcDjbO3TzA8ntQTg5l84cLTPARQAdAGQADx1tUDyd9pF0CbIfD35+jO5UEX+BMkYyRRJ1TFPOlc4KkzBFwwis/ByHszvRuNtuin/gjfcvQ1MH8LU38Lb2QI0uN+A+gg+LRU755OpWMAXiily6l5vP19xf6UvvT7XojTW2f5QpkO8mFh0BRhbH/FiXJpU6ytv1Tbtl42M7rzRlWSFsfl1TK25cqddKSutzKxN3n6YUF0BaaPuSY1a2oxXW4u1mh/3HwSGno1mx6IaBsqbvr8LX8gjWzBn/9Q4ALkdK9Gq8W5Uq0BVPITey6XHkhlczXk50RgRIRpZNDdj8EzA9Z7KRxuze+OC4nuPcuXbwa6Nto6jicAlC37Lg0NLjqe/HExfA666AiINkWH0CNr2ci5ZNMxleizRIwiinoFUNC0p98O6EZZlxwrC//9MxyjIvuWs5kQsAAAAAElFTkSuQmCC", "gold-2": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNDo0NSswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNDo0NSswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTQ6NDUrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6YmY4YjU5YmEtMTFiZC0wYzRiLWFhM2YtOGY2OGEzZjE5MmEzIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6OGRlZjMzMGEtNjU1Ny0yYTQyLWE0MTQtYmFkZGUzZmU3ZjdjIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6Y2UyMDJmOGEtNGJmNC1jOTQwLWE5M2YtZGMzZDM2ZWEzMjE3IiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6Y2UyMDJmOGEtNGJmNC1jOTQwLWE5M2YtZGMzZDM2ZWEzMjE3IiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE0OjQ1KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpiZjhiNTliYS0xMWJkLTBjNGItYWEzZi04ZjY4YTNmMTkyYTMiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTQ6NDUrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+jV9DVgAAAaFJREFUOI1j/P//PwMlgIki3bQ2gIeBgeE1AwPDEwYGhpcMDAycpBowh4GB4REDA4MdAwPDYwYGhulYVf3//x87/jv3//9/21Oh/OL/f5/8x6aOBdW4owwMDPwM3x9srWT5d+bsf06xXDbBn78ZGN7kMrBLnmRg+FTIwMDZz8CggN0Ftw/bMLy4YMNZ5cvwf9ccH51P1yO91lex/H99Jd/u/+/das8v+P3//2U+B7IeRuR0cGQFH8PO7f8Ovvv0h+PdewaVsGAxdTXFvwrMklzXTm1ieCoi8PuBGKfye5OMvU5YA5GPR7KT6Z+oSUOdjHl0pOj2RbN+veZS+HZ2w6o7XzftfLBFWY3L8OyNU9zIelDC4PEdhjIrvX+9jL+4GXxSmWN4+X5Izqxj/CcsrrwvKoYhVlLuOYO8Jls3TgPMA/iyrm/6NO3TT5aVrC8ETtv4MjpzMP+YJ8j3O0lYmYfhLzOnx+sXn5YxMDCswWqAiIL8dHVXVrUHx59v+Prmz1FGJpbPokL/Xn/++Hvuw0u/eZ/e/+4sJ8k1E1kP49DPTACnUdRUdg8BUQAAAABJRU5ErkJggg==", "gold-3": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNDoyMCswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNDoyMCswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTQ6MjArMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NjQ1NWVlYjAtYjdhNi02YjQ5LTgxMmUtNzM3NDE0MmY2NDU3IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6NjVhZGM1NDEtMTFkNi04NzQ5LWJkYWYtOTM3NzY0Y2NjNzIyIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6OGE2MjY5ZTEtNjJjYi1jNzQ1LTgyZTktYjQyOGRjZDdhNDFmIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6OGE2MjY5ZTEtNjJjYi1jNzQ1LTgyZTktYjQyOGRjZDdhNDFmIiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE0OjIwKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo2NDU1ZWViMC1iN2E2LTZiNDktODEyZS03Mzc0MTQyZjY0NTciIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTQ6MjArMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+xzn2iQAAAbJJREFUOI1j/P//PwMlgIki3dQ34P8vZJ4QAwPDMwYGhl9QWgCrCf///8eF9/7//+/L////tf7////v////W7GpY0E17jcDw39WBgZGBgYGhoMaDL8//WNgtf3L8O/XDwYmYS0GBmYCXmDYzMDAuIfh/fWqzhfHpt1gYGW0+fftYAED0yNzBoaDjxn+bmlgYLiPooMRORp3zTNm0DZgY7h69MaVx1d/a6tbOujYhJlc/fWeXf/pzQMXFA3lzv9jUDZiEqjAbsDemfwMa9b9ucEqxHTfw+N7+YZ5fy9GZ6t6XD78dIeLnbL21398U29feC4X0X5XGaYHJQxExEV6pRSYJL//ZRB5/eA9T1w8j86d829rmPn/6Vx98lb80L57FgKc32/gDIO7N/8XWWn/WVFWKSb+65vgURZ2vq/OYbKRVnYy/w7vY9gXEiMgoGUuPAmnAS6xcv6/PnxL+/vqq7l/pFjRvauv798+9WHptaPfr0UlCKeoafHbvnvGMQ+nAXxS3Jss4hRKLh19feTzm0/membCD///Yo5SUue/y8P11+PQ+q+7DbXZS3HGAjlg4DMTANCQ1feiy9cHAAAAAElFTkSuQmCC", "platinum-1": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFs2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNCswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNCswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTQrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NmUxODA4OTktNTAwYi1hNzRmLWEzMTUtMDQ3NjcyYWYwMjkyIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6MGE2Y2IyNTktMDEwNy0xMDRlLWFiNWItYzEzNGZhNzM1ZmI5IiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6NDIwZWYzZjAtNjk3My02NzRkLTgzNTUtMDJjYzNjOTM1NzlmIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NDIwZWYzZjAtNjk3My02NzRkLTgzNTUtMDJjYzNjOTM1NzlmIiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE0KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo2ZTE4MDg5OS01MDBiLWE3NGYtYTMxNS0wNDc2NzJhZjAyOTIiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTQrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+E8LjMAAAAepJREFUOI3Fkztok1EYhp/zX5pLm+qQSJooiKXGJjaoqyJOukQpKCooOIRsXgoOgi5u4uQgSBVBFFGo0qGbVlAHFxebQXqxUrU1jcGWEI25/H/+z6FNTYLBoYMHDhy+j/fhfXk5SkRYz9HWpQaM+kO1LELAOQg5IDdhMduyX/MtIogItNzUyjwvIrkzf9nXdW0jDMKpD8LnT7BwDI7/M8IOoBcoAx6gR0i9htse0HcJqYOKEWtVMNcAUPUWHsGJnZBYAr1i4/cJB8ZN/EUoDNaY98Ikiu9+hfMOxo4oRpocWIVaYuxb9bS51Z0KmmpmXLiSgUIcts3AaF5n1CVsT9jcCesYrALWHCSrjssz9fP6RLZyKLZ7w+EfgY5ZzZJN+5bt7FLA3FvVmBuweNml8fypzqW7K2n/ABRwEgh+LZ/PZSpX+3q9Z9MThRuusPvxlj7vUHWyaEUiXReeGNx61VBjEwDgGnh9X0q5xbzdWQY8cZ+ygek3y7PBmC8xvNGckgZAU41RIFxyhno6tM5YwEU87M6HstWPLkv2R6O++5GycznerkaAODBgqItmt8mCYjrt1o7qVSfSX6w9rCgl3aZm9QPpdoAMkDHVsG6ozS8UyQdgGy7tfbJDe7un5Nz7Zahn8y0O1H//jb8BKI3TupAgmWkAAAAASUVORK5CYII=", "platinum-2": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxMzo1MCswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxMzo1MCswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTM6NTArMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ZWE0NmExZjYtMWVmYi0wMTQxLWE1NzktNjg1MzgwN2E0ZmM1IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6OGVkODdkN2MtNmQ0ZS1iNjRjLTgwNTItNmNiNzFlZmFhY2U4IiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6MjE2MWI3MTEtYWFiZC04YjQ5LWEzM2ItNDc0OTg0YTQ3MjZjIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MjE2MWI3MTEtYWFiZC04YjQ5LWEzM2ItNDc0OTg0YTQ3MjZjIiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjEzOjUwKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDplYTQ2YTFmNi0xZWZiLTAxNDEtYTU3OS02ODUzODA3YTRmYzUiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTM6NTArMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+ep+O3wAAAe1JREFUOI2lk01oE0EYhp+ZZnfd2J9NTSmUpl4KWrXgRYWIQsSDIYLioQXFgghtihdBxEu9eqtF6KGCP1URvFhL9WjBg3/ooXjwoJBqtabZGlulukk2ZsdDSGhii2A+GGaYj+/lfeZlhFKKWkrWNA34SgdR1WgDzhU3NQwLyap+2bdSCqUUVK3B4n1aKZWOr9Evza2JYAFRiM6BPQ+pGEQ3/gthB9AJ5IAIbNnrcW1CclZB+iTcuQj7puGDASRWCYhSCpPQ0wmHFyDXmKc3CA1jGqIerH6P5QIspwRTIYH+FqYOwL0KB+5K4cjDxfxxM2QM+HVx6Qd83A79zR5nHkhOO/Byk2JP+29utEoksihQfoOnhjj1JZMfuf9sqe+5ndNevP8VX5zLXf0mmMlkvG4XPgUFgzOCK2OSvr8QBHAe8CecR4lZJ7bkFGgJB7p/JrNDpi6FP+v1bG01nrxpMyK3VsVYRgAYB4Y7zNF2iKU6zHCdZIOdcHqNrvrAu1ffw1ZBG31clUJFjBZgKQ5lN5tDuia+brPd1/tDJs2aDO7a2XS5q8EXaaoSqEA4AVzwsJOSWeGqwIpg3IOszHlxJYVqdL3gXcvXcns9hCQwLxkxFQendXF0AmwNOKbVTe521U3H8F3/vJ6D/62af+MfagXNuIlSNSUAAAAASUVORK5CYII=", "platinum-3": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxMzozOCswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxMzozOCswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTM6MzgrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6YmUyZTcxZGYtYTU3Mi05NTQ2LTg3Y2EtMGYwMTlmZWE3MDQ5IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6MDM4OGRkZjQtMjA0Ni05YzRhLTk4ODQtZjMxOTQxZjkzYWJlIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6MjExNmJmMWEtNjA4YS0wODRjLWFjYzUtYzAxOTE3ODRlZmY0IiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MjExNmJmMWEtNjA4YS0wODRjLWFjYzUtYzAxOTE3ODRlZmY0IiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjEzOjM4KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpiZTJlNzFkZi1hNTcyLTk1NDYtODdjYS0wZjAxOWZlYTcwNDkiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTM6MzgrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+0bWKEAAAAetJREFUOI2lk01IlEEcxn/zzry7635oS1+7tnnYEtS1kmWlPBgdiwyM6BDZqUPQYSHo0qWPa0GQHQq0UxBRXUSiixBJQXQyJShkk7LUTZL8WnXffWc6xC7rpgTtHwaGefg/PD8eRhhjqGasqrYBVbyICiEGXIJ6A/o2zExV6KXcxhiMMVBx0n/efxhjJi9soBf3NkRoAI7BqWlYyMJqFxyP/gthHxAHNHDG0N0CV0YFAx5QKbjeC1YfDErgc5mBKLYwAKcb4UQWjC7QNiXpVYa9tkA4gvEDhosGxiICOQbPj8BjKGth8Vfh5NNPuXOja+bVO0WbK9jut0iFBB2Lmm0PBe0j8FoU6Ikauv9KkF7TNcsfl25NLLuxpkQwLWadZ7t2eEcE+BsDsmVC0rUH+nwumReSy3chv85AAtcA9XVlaPKn057ziKEcTFtg1yorvrpUaE3Gat6P7/QcvVdWYwlBA0+Ahoj3QUdQ1TY3B2+21tqpRJ29X4XtO3NfViIzebf/7WYtADhAWFnxfMyX8SHqk355MOcYQlvtQNOh8LfwFrV7sMKghCCAs8BVTWHeQs665qUXPmgXOa9NIqQ57HF0rr9OBR6VIaxLkAUyFjc8kByW4vwbmJMSOhHRTs39BZ81/H2zBP87Vf/G34VryniiSSwUAAAAAElFTkSuQmCC", "diamond-1": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNToyMSswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNToyMSswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTU6MjErMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NGE5NmYxMGYtMDkzMi0yNzRmLTk5ZTYtMjJlZDZlNjRkN2U5IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6YmJjZTRiZTEtZDg1Ni1iNDRiLThhNmMtMjgzODgwM2FiZWUzIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6MDBhZTIzYTQtZTgxYS1jNTQ0LTliZjktMDVlZDk5MjdkNDk0IiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MDBhZTIzYTQtZTgxYS1jNTQ0LTliZjktMDVlZDk5MjdkNDk0IiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE1OjIxKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo0YTk2ZjEwZi0wOTMyLTI3NGYtOTllNi0yMmVkNmU2NGQ3ZTkiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTU6MjErMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+oGab1gAAAc5JREFUOI2lk09IVFEUxn/3+Rzzz0yEZRbhphCZQl0YQZiYRETUJgxahIXZomho5yaHaCkNUbQoyrb9gShopUJgRhCKFGg1SVJDKUJGpcNg+uZ9LezN6JtZNQcOHO53v3PP/c45RhKFmFUQG7C9wJhVp0GgjBLSpFdADCB+47C0csUr3MZnNW3UPbjDwJ8FHIr+0YWwMK/GGYp20ImTpwIAqxJz8h6jI1+YGO7jmqlmA8JokVQqQar/CY+TP5jrjdCdIUlCEpTK2vLMHQq/dCdB+H3PBXXdGtbXeFy/9p3RcY+XFbECs1hsWj70m1H/t8rbOVR7U3d7Yly5noTKRhpyKzCCve5u+9I3mf2pI97LZqdC1XHJXFQsGFXf5kF3DFtZXiZAEBC0fbpcdHpQbHdtNgnr/OfJ4sj8O9Ois6H7S2KXqiCbwHiDlGnjVggcGBlLL1TMpGcDL+yq11ed8aPHrOb3j9zp+g6elz9c3cbcBIBVS2n4XOKn7X4seXu76VRZ00xk2XGmlgcaTzC/dg7yJgDY1s7Bw508TUwz8T05F3zTuzGs2Sye2YA1Gvi8NarYjSlpfbNq/Fh+EX1udmhdqFV12LlYjoj/awVv41/ydgdcWTP06wAAAABJRU5ErkJggg==", "diamond-2": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNToxMiswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNToxMiswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTU6MTIrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ZGNmYzZmZWYtZjQ3NC1hOTQ5LTk3MWMtMWIxYjk2ZTQxM2QzIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6NWZiN2IwZGQtMDE3Yy05ZTRjLWEyYTktMjlkMGNiNGM5NDhjIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6ZDcyMDM0M2EtZDA4OC0yMzRmLWFhYTYtNTZmZDM2MjUwNzUyIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZDcyMDM0M2EtZDA4OC0yMzRmLWFhYTYtNTZmZDM2MjUwNzUyIiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE1OjEyKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpkY2ZjNmZlZi1mNDc0LWE5NDktOTcxYy0xYjFiOTZlNDEzZDMiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTU6MTIrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+oOsezAAAAehJREFUOI3FU01IVGEUPd+bhzaEI8440oyBaMKgBooQtWhjG3FQTMJUSCxlBpVcGBgOSD+CJgWuBF24CRVqE1FgJBKzEDWRsIhowrEGZEZCx6cjSL3mnRbTc9RnbVx04IPDd++5nPvd+wmSOA6kY6kByDoRYt+tAGDZYwmLMQBaMkU3LuMQPA/gq6lAY44dTkmGWP2GIAATzRCPn2Ns4g4eHRCQROIdiPyb9E6S7BvlWGc/fR3tbPfPcmVpmdHu2xwkySud9ABM6nSSWsaL51SN9gFtIOGaQB7td1WyuJL1Z66ybTrALUUlCy7zkqFAShPrMvwkSpgLELKdKYUbGq392rCopachrtFWzuZ7CnmhizcMBXCSQFPspak1tIZTlE70xufShhnEWZY6A6SoYXPWOGesT7TX+1sQ+h4IAaBg1yYVTa9T5TJTXQKLrmrJHZgXUddTKIikdfzqUXxyNpYQ1qdwcA9C5g1slbktjo/5WDE9g+PtfX75+j2+EJ2C80WP8lC9hg8I/3UKAIF0wnl9u7d64j0zW/zbKPzhzvC+olz5bgTWZN7RLfyBZAGq+jiec1qUr0Z+7nyOxBY/DdlqsWlcJKMD/ViIW5MM+95wU8oyxv/pQIf5PBwguLuAtcMx3YH477/xN6KqMkbUNGl9AAAAAElFTkSuQmCC", "diamond-3": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNTowMyswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNTowMyswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTU6MDMrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ZmQ1MjhjYzgtZDQ3Yy03YzQ0LWI1ZTYtMGNmY2YzZTg3ZmU0IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6NmUwYWVhMjktMmU5YS1lZDQ4LWIyNzItZWFmMWIxMDdkZjFlIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6MjBhZmVlYjAtY2FiOS04MjQ0LWJjMTktZGQxM2JiM2YxNGY3IiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MjBhZmVlYjAtY2FiOS04MjQ0LWJjMTktZGQxM2JiM2YxNGY3IiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE1OjAzKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpmZDUyOGNjOC1kNDdjLTdjNDQtYjVlNi0wY2ZjZjNlODdmZTQiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTU6MDMrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+w4hEuQAAAd9JREFUOI3Fk0tIlGEUhp/ff5omRiHRYsSaIrSBgkqIscuiJCOpSaygRSlBC0XbVLRoYZvcC0kXJAkVg2Kgm9gNk64G2oUCKWZkhiFzEVMDY45M4P+26R+brDYGvfDBgfO95zwf3zmGJOainDm5/0UBhx0YBmBAoJGDWyuo3lHOBrcL9+QUqWSK1PB73t4ZoO/eebqYBvvlWQRltdT2nqOnxElRIkJi5B1j8VEmyorx5YzjvNtGZ1UTjVkIkpCEs0KbqmVpV5cug1h3Wm14tKYnok+V+9Xg26ia8EelJWntHm2zfRkCw4vnYcig7wbDRUGehYYY8HbS3j2qcH+UaNOgru+s48hrYHEpy2YRkCuoSXXMv/hB847qLLt1Kn/QEl6VLo1J1OtEXruCxdf0BDTjywQI/KmVZuCCWP0gSN2rSXzaktMQiTmO6RZ+HV448k1s1/qfCxj2IBkGsAicm8dblq+61Bzq39uBOz+KmSzgTeEVs6p3aHoi0M3jwkN8mfmFbAIES0R5a/p+/cukzH3xM+SJkuanlvvAzTArrMy93xPY8kCghau54EtMSQkj/flFq6vSigGW3fhPBPZxieO3rfjJR5ZFwez83wl+aIEfj2ni+PqcsV9zNoHx37fxO/+PEum/Ur4KAAAAAElFTkSuQmCC", "champion-1": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNTo1MyswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNTo1MyswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTU6NTMrMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6YjQzY2FiYzgtZjFiOS0xYjQ0LWFlNzUtY2RhYjIyZGU3MjQ3IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6YWM2MTlmZDItMTFkNS1kMzRiLWI3NzktZjliMjIyNzNmZjNiIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6MDRkMjMxYmItNTk3OC0wZDRmLWE4OTUtNmFiZDlmNWVmZTIyIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MDRkMjMxYmItNTk3OC0wZDRmLWE4OTUtNmFiZDlmNWVmZTIyIiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE1OjUzKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpiNDNjYWJjOC1mMWI5LTFiNDQtYWU3NS1jZGFiMjJkZTcyNDciIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTU6NTMrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+9yeg/QAAAfZJREFUOI3Fk0tI1HEUhT+dGAtDsBfVRqRIIXJVkS4SiUAQspASWlj0AkESixKcsBB60BQ9RIJaRCAEgUEyoKOLwKLXVGIiiToMBlpOo9nAjM7f//xOC7MYZmzjorO5q/NxuefcNEksRelLcgNI4u8WucAY0AKc4m7peL6v3hzaRBNQCdjA5URfIiADB19w8Jo9jBLv0zvJ6NZ2e0M67TiIA7WLAarIwY33hArvl1k7245bVfotf4e6rhRYeZ6TZm/F+h6gPBXgPBe3KsP4TSw4OCcrrARFRufnhwZVZtKXDNjm7KbXpcan7qD876OSpCGPvB01uiBJxkiRn7bsEQVqNoaSAc3Fym0s7da9c32SJOu7puu2fFtdwjCDbaZTkkKBuIZ6w+pqMPULvj8xrlhmLc9YJdZuNgCYWWKTwejkNGGiEwQArCi8fDLFnLHXJMVY6OzHf0ctPa0RjQ3YkqQ3zXI/LFGRkWTbturK23S11Pfjxq7YyhRHfM7NHcrWmDQVmD+YbUmRKRlJGnk1o0dNPnmPqjY/PZAqhYPkcZuPLrP/2TFVvLim6wsJhD5r+EGx9vW7VH224JMTDi9WpCyymSWLTo5kvkUT+ipJjw9YRevoIQcBdf9qYh4wA5zGyW481ZGy8Va5i2gHzgACLiUA0v77N/4CaeC4icRllSoAAAAASUVORK5CYII=", "champion-2": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNTo0MSswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNTo0MSswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTU6NDErMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6YTc5ZmIyNmMtOWYzYS05MzQwLWE4OWMtNzlmMTA4OGRlYmMwIiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6YTc5OTNkMjQtNmYyOS03MDRkLTlmMDgtOTlmNjQ1ZjJlNDc5IiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6YTRlYTc2ZDItZmFmMS1mYzQ5LTg4YzctMDEzZDhlZGMwNzRkIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6YTRlYTc2ZDItZmFmMS1mYzQ5LTg4YzctMDEzZDhlZGMwNzRkIiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE1OjQxKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDphNzlmYjI2Yy05ZjNhLTkzNDAtYTg5Yy03OWYxMDg4ZGViYzAiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTU6NDErMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+ScsoJwAAAhlJREFUOI3Fk01I03Ecxp/NaWrUyi5FQct2qQwvlSCBh0kdMqtDEQwiSUYHIaRDMnrRSHqBIvGlQxGSlJKEMV0vpqA1wiCbsuXbUPdipeA2dZuN7b/f00H/OtluHnpuv8Pz4Xm+3+9PQRLrkXJdbgAgidUUdwHEALQgAxUwl0qFHZekwgwcAnAPgABwZ61vFZCH43s6Mg3aWFoOPCjdEAYjFIxSGNI9OAA7DHtF6jGNKRM4mAzQAKM2rOIAOyebWOdo4xsuy/GWbeONrKFVdFZkR1KARys+lVxlV8o41Klpsd52WAquoyq+pvYUTgPARyNvpEdV1CjjBi+T6vO50feFE+YHwSHvpAiTpPUZWwaeLyXxOcVfm1kM0kd33RFmJVR4deH3U+O5Ltp7AiTJ+VE6L252omSLRznvoIdx+tXOZtm3ssboJn9ev7Uf09N/AABBF1xjC7MYm/OKkBtuAJgZBkb6QpCypPyECh/01I1a/Hxd7abXJQmSbDrDgpdnqSPJmYlFceXoJ9aWf2NXCfUJFU5uM6GnjPruarbKUf0eBuamGFx6RXi/aKi15vBUmUHTl2yNzbi1nViwCFPoO3u9do7IoFkbhxd/8DMdfFebQwD1yQCXod//Vd1QHMs9oQigMptbZcDN3VQXKYN4Uixyz+/rVgO6ZAAAqFo+5ffYiRf4+ZjXbA95dQcqATQCIIDba2an+O+/8R98o7blTg6CuwAAAABJRU5ErkJggg==", "champion-3": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNTozMSswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNTozMSswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTU6MzErMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MjQ4YWRkMDgtN2YwNC1lNTQ3LTg4NTgtMjJhYmQxNDM3ZmI0IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6YjhkMThkY2EtNmRmMi1kNzQ1LWIxZmMtMmRiMzJhNTYxZGJiIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6MWZjMjIxM2QtZmM3OC0wMzRiLWFmZDUtYjVkMDZlNjViNGExIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MWZjMjIxM2QtZmM3OC0wMzRiLWFmZDUtYjVkMDZlNjViNGExIiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE1OjMxKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDoyNDhhZGQwOC03ZjA0LWU1NDctODg1OC0yMmFiZDE0MzdmYjQiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTU6MzErMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+GBGL+gAAAmxJREFUOI3Fk21MDAAcxn93WkheSnQS1jI2ki2rpi1hs7bwxcsY87KJzcZmMysvM2wkk9mImWE0zDjH2BBSfPBSF7VFXS/r9HLVpVwvutx1jw9ndd998Hx//v/n2f/3N0jiX2T8JzeAP8FxQIAVGAB2AZGkh5spWKyJEawBIoFHQD9QDbz3eyWxNvZlaPYcMZl6oAm4zHjy+HRY29Um+8n5vWPgAlAKNJBEBwfm9YwZHvBgs5YNffZYn+zUqq2mPhbQwD7TL+SQU5Ia7+pmGq0k4uDgnIHw5nu63lmkp5IIAvjtxlgd7EqI3xv8JH71WGt9cczriDgSMREBEJnB1tMnprmj5zEuejkrCWNSl13tYPAnyE3uM7070+OwXGxW4Y0OWR93S5JcjWovPqprkuTt98nlHJTkkU9efbmknOEKJjZwa4VvRv4224+cjZWqMnvkc0vXM3s3pdNAxf2hp5JU92pQFSVdKr889HDL+K9I8p+xjSXc+eRsGt3te1brKOVFoY0W209fvXWwpA4HrWUqAuHtD8L+0UvlY2NuQW9nIAcplLqaiAqde3tRwgzsNc2ERMm44+zkU5mzUuamZo868vZBO1fznxPUMNBi7/RUgieQg1hgJhlTC7Gs0TJLluNbS6VbXrfktKmvp21Qtw5V62RS7flzSQqPGb0HmD7CwYguEYWwrFdqhdklT79PkmR736XirI6mY3ECvEDy8PK/FYKBpcAXWtmPufTNO6d5Qqbjg6EGoLso7Mb3sinpV6qOA7v/Jo4MrDARmB2QZB0mGslJs8V8zVP22pA6xlIOfmyAGGAhkjD892/8A9whZHtjXWIHAAAAAElFTkSuQmCC", "grand-champion": "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFwmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiB4bXA6Q3JlYXRlRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNDoxMSswMTowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAxOC0wMS0yN1QxNjoxNDoxMSswMTowMCIgeG1wOk1vZGlmeURhdGU9IjIwMTgtMDEtMjdUMTY6MTQ6MTErMDE6MDAiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6Yzk4NjFkYTAtMWVhYi02NDRlLTg1ZDYtMmZmZjdhZDcyNDM0IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6MzAyYTA2MTItM2EzYy0yZjQxLTk3OGMtNDc4YzhlMGQ0ZTZhIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6NWY4Yzk0ZGEtMzc3Ni0zYTQ3LTg0YmItNDg3MWE3OGU5MzJiIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyI+IDx4bXBNTTpIaXN0b3J5PiA8cmRmOlNlcT4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNyZWF0ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6NWY4Yzk0ZGEtMzc3Ni0zYTQ3LTg0YmItNDg3MWE3OGU5MzJiIiBzdEV2dDp3aGVuPSIyMDE4LTAxLTI3VDE2OjE0OjExKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpjOTg2MWRhMC0xZWFiLTY0NGUtODVkNi0yZmZmN2FkNzI0MzQiIHN0RXZ0OndoZW49IjIwMTgtMDEtMjdUMTY6MTQ6MTErMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPC9yZGY6U2VxPiA8L3htcE1NOkhpc3Rvcnk+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8++D7MyAAAAtVJREFUOI3Fk09Mk3ccxj+/t63AbG21rSAguuBgUezQaYySzUzNFoc6Er25JR6cxNNiTLa4LUtYoolHUGPUwTTD+RejQjzpgpLVCTjFilYYI9BWYJTSl1JX2r7v14NZtruHPZfn9Jw+z0eJCK8T7bXWgAIP8BcwBrRiJcOVz/d8pOVYc6NBukVQ+RVUWkwxtxw5eSNDDuADlr/qd+fUq+ZqKd6clwDaqHEE+OO8Efp5X+La+GPpnAhKT8uBZEvkhjGy3dELnON9NUbTRnPB2nlHNVVXJKr2UuaJTFqCx/dp210eWVNYHfa75zpk016XAmhv1InpSQbOuT8YHTLb95/KO+taJqvqN6i31bG3hKXfTkVLqmbcDLoiw32p3Ck94654z8VoYgAxhULXEvofJFhYNlsvX2FNaF6K9QmZbvIph/VWtJfK3mUnH0TDB8z0eJG3yMa2Wi9pS5pmbz9G2uCreAlvVjmZjmWdWXvaOQsrk63aifaJbgAntcU6F3YmG+tq7ks8YoqIKT/Vdkr4xykZaU7I6d13JStZeRE35HFHXO43mBc+zbn1D8b9nAi3EHlq1sX/DjJ21yARMwn5oxStdFCwyk7EH0N/bhC7ozESyPKwVR1qnokBTSjoAnR2l1VSvrj/1ylHbN33lz/myeAAv/j6UIbG+odLqCgr5eAnfvK1hb2PBmy+I4FnJtixwj0ABkNePqte8yiUH1h384dhVm4oZXJHN4YhLJpdSltDP9rcFPnK0zUU/s2E44BCwe8oLJyt8a1e+81050zIHu32hzzJVIqtX5Rgm2XhzHcB1AuND7e9M552TXiDp9xVu64/92cwsIAdCFDmKrblRQpuXm1M7Z1vc1xbXj7fOTSSrBj9c4bCdMHFZNiz805b5kv7ZF5Xz3DfYEfkcFy4/d9Xf40NAW7jpYetNp2OutRh/0GjfscbGbzcAzrIRYCGf1343218CVnYTldbXQt5AAAAAElFTkSuQmCC"};
+
+const rankOrder = [
+  { name: "BRONZE I",     key: "bronze-1",   need: 0 },
+  { name: "BRONZE II",    key: "bronze-2",   need: 800 },
+  { name: "BRONZE III",   key: "bronze-3",   need: 2500 },
+  { name: "SILVER I",     key: "silver-1",   need: 6000 },
+  { name: "SILVER II",    key: "silver-2",   need: 13000 },
+  { name: "SILVER III",   key: "silver-3",   need: 26000 },
+  { name: "GOLD I",       key: "gold-1",     need: 50000 },
+  { name: "GOLD II",      key: "gold-2",     need: 95000 },
+  { name: "GOLD III",     key: "gold-3",     need: 170000 },
+  { name: "PLATINUM I",   key: "platinum-1", need: 300000 },
+  { name: "PLATINUM II",  key: "platinum-2", need: 520000 },
+  { name: "PLATINUM III", key: "platinum-3", need: 900000 },
+];
+const DIAMOND_THRESHOLD = 1600000;
+const DIAMOND_AUTO_WIN_PERSEC = 1000000; // "a gajillion auto clickers"
+
+let score = 0;
+let lifetime = 0;
+let totalClicks = 0;
+let perClick = 1;
+let rankUps = 0;
+let betrayals = 0;
+let currentRankIndex = 0;
+let paused = false;
+let gameEnded = false;
+
+// repeatable click-training upgrades, gentle 1.15x scaling like cookie clicker
+const clickTrainers = [
+  { id: 'swings',   name: 'Practice Swings',   desc: '+1 MMR for each click',    baseCost: 40,     addPerClick: 1,  owned: 0 },
+  { id: 'reads',    name: 'Sharper Reads',     desc: '+4 MMR for each click',    baseCost: 600,    addPerClick: 4,  owned: 0 },
+  { id: 'rotations',name: 'Faster Rotations',  desc: '+12 MMR for each click',   baseCost: 6000,   addPerClick: 12, owned: 0 },
+  { id: 'aerials',  name: 'Perfect Aerials',   desc: '+35 MMR for each click',   baseCost: 50000,  addPerClick: 35, owned: 0 },
+  { id: 'flicks',   name: 'Frame-Perfect Flicks', desc: '+90 MMR for each click', baseCost: 400000, addPerClick: 90, owned: 0 },
+];
+
+// repeatable auto-grinders, gentle 1.15x scaling
+const autoGrinders = [
+  { id: 'ballcam',  name: 'Ball Cam Setting',       desc: '+0.3 MMR each sec, per one', baseCost: 30,      output: 0.3,   owned: 0 },
+  { id: 'freestyle',name: 'Freestyle Trainer',      desc: '+2 MMR each sec, per one',   baseCost: 250,     output: 2,     owned: 0 },
+  { id: 'grindbot', name: 'Grinding Bot',           desc: '+15 MMR each sec, per one',  baseCost: 1200,    output: 15,    owned: 0 },
+  { id: 'duoqueue', name: 'Duo Queue Partner',      desc: '+90 MMR each sec, per one',  baseCost: 8000,    output: 90,    owned: 0 },
+  { id: 'smurf',    name: 'Ranked Smurf Squad',     desc: '+500 MMR each sec, per one', baseCost: 30000,   output: 500,   owned: 0 },
+  { id: 'aimfarm',  name: 'Aim Trainer Server Farm',desc: '+2800 MMR each sec, per one', baseCost: 120000, output: 2800,  owned: 0 },
+  { id: 'warehouse',name: 'MMR Farming Warehouse',  desc: '+16000 MMR each sec, per one', baseCost: 550000, output: 16000, owned: 0 },
+  { id: 'botarmy',  name: 'Diamond Bot Army',       desc: '+95000 MMR each sec, per one', baseCost: 3500000, output: 95000, owned: 0 },
+];
+
+const miscUpgrades = [
+  { id: 'lucky', name: 'Painted Boost', desc: 'Do nothing. But it look nice.', baseCost: 5, owned: 0 },
+];
+
+const robExcuses = [
+  "The bandit car is screech away with your MMR inside the trunk.",
+  "He hotwire your MMR right when clickoff is end and drive off.",
+  "The bandit throw your MMR into his shiny car and peel out before you can react.",
+  "Nice try. The bandit car already gone, and your MMR also gone.",
+  "The bandit never plan to play fair. He take your MMR and floor it.",
+];
+
+let inBattle = false;
+let battleTargetIsDiamond = false;
+let battleTargetIndex = -1;
+let battleSeconds = 5;
+let battleTimeLeft = 0;
+let battleTimerHandle = null;
+let playerBattleScore = 0;
+let banditBattleScore = 0;
+let banditTarget = 0;
+
+function saveIcon(key) {
+  return "data:image/png;base64," + RANKS[key];
+}
+
+function getPerSec() {
+  let total = 0;
+  for (const g of autoGrinders) total += g.output * g.owned;
+  return total;
+}
+
+function getAutoClickerCount() {
+  let total = 0;
+  for (const g of autoGrinders) total += g.owned;
+  return total;
+}
+
+function costFor(baseCost, owned) {
+  return Math.ceil(baseCost * Math.pow(1.15, owned));
+}
+
+function renderShop() {
+  const clickEl = document.getElementById('clickShopRows');
+  clickEl.innerHTML = '';
+  clickTrainers.forEach(u => {
+    const cost = costFor(u.baseCost, u.owned);
+    const row = document.createElement('div');
+    row.className = 'shopRow' + (score < cost ? ' disabled' : '');
+    row.innerHTML = '<div class="shopRowInfo"><span class="shopRowName">' + u.name + '</span> ' +
+      '<span class="shopRowOwned">(you have: ' + u.owned + ')</span><br>' +
+      '<span class="shopRowDesc">' + u.desc + '</span></div>' +
+      '<button class="buyBtn" ' + (score < cost ? 'disabled' : '') + ' onclick="buyClickTrainer(\'' + u.id + '\')">BUY IT -- ' + cost + ' MMR</button>';
+    clickEl.appendChild(row);
+  });
+
+  const autoEl = document.getElementById('autoShopRows');
+  autoEl.innerHTML = '';
+  autoGrinders.forEach(g => {
+    const cost = costFor(g.baseCost, g.owned);
+    const row = document.createElement('div');
+    row.className = 'shopRow' + (score < cost ? ' disabled' : '');
+    row.innerHTML = '<div class="shopRowInfo"><span class="shopRowName">' + g.name + '</span> ' +
+      '<span class="shopRowOwned">(you have: ' + g.owned + ')</span><br>' +
+      '<span class="shopRowDesc">' + g.desc + '</span></div>' +
+      '<button class="buyBtn" ' + (score < cost ? 'disabled' : '') + ' onclick="buyAutoGrinder(\'' + g.id + '\')">BUY IT -- ' + cost + ' MMR</button>';
+    autoEl.appendChild(row);
+  });
+
+  const miscEl = document.getElementById('miscShopRows');
+  miscEl.innerHTML = '';
+  miscUpgrades.forEach(m => {
+    const cost = costFor(m.baseCost, m.owned);
+    const row = document.createElement('div');
+    row.className = 'shopRow' + (score < cost ? ' disabled' : '');
+    row.innerHTML = '<div class="shopRowInfo"><span class="shopRowName">' + m.name + '</span> ' +
+      '<span class="shopRowOwned">(you have: ' + m.owned + ')</span><br>' +
+      '<span class="shopRowDesc">' + m.desc + '</span></div>' +
+      '<button class="buyBtn" ' + (score < cost ? 'disabled' : '') + ' onclick="buyMisc(\'' + m.id + '\')">BUY IT -- ' + cost + ' MMR</button>';
+    miscEl.appendChild(row);
+  });
+}
+
+function updateUI() {
+  document.getElementById('score').innerHTML = 'MMR: ' + Math.floor(score);
+  document.getElementById('perClick').innerText = perClick;
+  document.getElementById('perSec').innerText = Math.floor(getPerSec() * 10) / 10;
+  document.getElementById('totalClicks').innerText = totalClicks;
+  document.getElementById('lifetime').innerText = Math.floor(lifetime);
+  document.getElementById('milestones').innerText = rankUps;
+  document.getElementById('betrayals').innerText = betrayals;
+  document.getElementById('hits').innerText = String(1337 + totalClicks).padStart(8, '0');
+
+  const rank = rankOrder[currentRankIndex];
+  document.getElementById('rankName').innerText = rank.name;
+  document.getElementById('diamondBtn').src = saveIcon(rank.key);
+
+  const nextNeed = (currentRankIndex + 1 < rankOrder.length) ? rankOrder[currentRankIndex + 1].need : DIAMOND_THRESHOLD;
+  const prevNeed = rank.need;
+  const span = nextNeed - prevNeed;
+  const into = Math.max(0, lifetime - prevNeed);
+  const pct = Math.min(100, (into / span) * 100);
+  document.getElementById('progressInner').style.width = pct + '%';
+  document.getElementById('mmrCurrent').innerText = Math.floor(into);
+  document.getElementById('mmrNeeded').innerText = Math.floor(span);
+
+  renderShop();
+  saveGame();
+}
+
+function log(msg, warn) {
+  const el = document.getElementById('log');
+  const line = document.createElement('div');
+  line.innerHTML = (warn ? '<span class="warn">&gt; ' + msg + '</span>' : '&gt; ' + msg);
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+function showPopup(text) {
+  document.getElementById('popupText').innerHTML = text;
+  document.getElementById('popup').style.display = 'block';
+}
+function closePopup() {
+  document.getElementById('popup').style.display = 'none';
+}
+
+function checkRankProgress() {
+  if (inBattle || paused || gameEnded) return;
+
+  if (currentRankIndex + 1 < rankOrder.length && lifetime >= rankOrder[currentRankIndex + 1].need) {
+    const targetIndex = currentRankIndex + 1;
+    if (targetIndex % 3 === 0) {
+      // crossing into a whole new rank (Silver I, Gold I, Platinum I) -- bandit clickoff
+      openBattle(targetIndex, false);
+    } else {
+      // moving up a division within the same rank -- car control showdown
+      openRhythmBattle(targetIndex);
+    }
+    return;
+  }
+
+  if (currentRankIndex === rankOrder.length - 1 && lifetime >= DIAMOND_THRESHOLD) {
+    openBattle(-1, true);
+    return;
+  }
+}
+
+function openBattle(targetIndex, isDiamond) {
+  inBattle = true;
+  paused = true;
+  ensureAudio();
+  stopBackgroundLoop();
+  startBanditSong();
+  battleTargetIndex = targetIndex;
+  battleTargetIsDiamond = isDiamond;
+  playerBattleScore = 0;
+  banditBattleScore = 0;
+  battleTimeLeft = battleSeconds;
+
+  document.getElementById('battlePlayerIcon').src = saveIcon(rankOrder[currentRankIndex].key);
+  document.getElementById('playerScore').innerText = '0';
+  document.getElementById('banditScore').innerText = '0';
+  document.getElementById('battleTimer').innerText = 'Ready...';
+  document.getElementById('clickBattleBtn').style.display = 'none';
+  document.getElementById('battleStartBtn').style.display = 'block';
+
+  const assistCount = getAutoClickerCount();
+  document.getElementById('autoAssistLine').innerText = assistCount > 0
+    ? ('+' + assistCount + ' auto-grinders piling on too')
+    : '';
+
+  if (isDiamond) {
+    document.getElementById('battleTitle').innerText = 'THE BANDIT: DIAMOND CHALLENGE';
+    if (getPerSec() >= DIAMOND_AUTO_WIN_PERSEC) {
+      document.getElementById('battleIntro').innerText = 'A bandit with extra shiny car block your path to Diamond I. Your auto-grinder already so many, he barely have a chance.';
+    } else {
+      document.getElementById('battleIntro').innerText = 'A bandit with extra shiny car block your path to Diamond I and challenge you for clickoff.';
+    }
+    banditTarget = 999999;
+  } else {
+    document.getElementById('battleTitle').innerText = 'BANDIT CHALLENGE';
+    document.getElementById('battleIntro').innerText = 'A bandit pull up with shiny car and challenge you for clickoff of ' + rankOrder[targetIndex].name + '.';
+    banditTarget = 8 + targetIndex * 2;
+  }
+
+  document.getElementById('battlePopup').style.display = 'block';
+}
+
+function startBattle() {
+  document.getElementById('battleStartBtn').style.display = 'none';
+  document.getElementById('clickBattleBtn').style.display = 'block';
+  battleTimeLeft = battleSeconds;
+  document.getElementById('battleTimer').innerText = battleTimeLeft + 's left';
+
+  battleTimerHandle = setInterval(() => {
+    battleTimeLeft--;
+    document.getElementById('battleTimer').innerText = battleTimeLeft + 's left';
+
+    // your owned auto-grinders pitch in and click for you too
+    const assist = Math.floor(getAutoClickerCount() * 0.4);
+    if (assist > 0) {
+      playerBattleScore += assist;
+      document.getElementById('playerScore').innerText = playerBattleScore;
+    }
+
+    banditBattleScore = Math.floor(banditTarget * ((battleSeconds - battleTimeLeft) / battleSeconds));
+    document.getElementById('banditScore').innerText = banditBattleScore;
+
+    if (battleTimeLeft <= 0) {
+      clearInterval(battleTimerHandle);
+      resolveBattle();
+    }
+  }, 1000);
+}
+
+function battleClick() {
+  if (battleTimeLeft <= 0) return;
+  playerBattleScore++;
+  document.getElementById('playerScore').innerText = playerBattleScore;
+  playBoom();
+}
+
+function resolveBattle() {
+  document.getElementById('clickBattleBtn').style.display = 'none';
+  document.getElementById('battlePopup').style.display = 'none';
+  stopBanditSong();
+
+  let won;
+  if (battleTargetIsDiamond) {
+    won = godMode || (getPerSec() >= DIAMOND_AUTO_WIN_PERSEC);
+  } else {
+    won = godMode || (playerBattleScore >= banditTarget);
+  }
+
+  if (won && battleTargetIsDiamond) {
+    triggerSoulSellEnding();
+    return;
+  }
+
+  if (won) {
+    currentRankIndex = battleTargetIndex;
+    rankUps++;
+    log("You beat the bandit at clickoff. Rank up to " + rankOrder[currentRankIndex].name + ".");
+    showPopup("YOU WIN THE CLICKOFF<br><br>The bandit speed off with empty hand. New rank: " + rankOrder[currentRankIndex].name);
+  } else {
+    betrayals++;
+    const excuse = robExcuses[Math.floor(Math.random() * robExcuses.length)];
+
+    if (battleTargetIsDiamond) {
+      const targetIndex = 8 + Math.floor(Math.random() * 4); // Gold III (8) .. Platinum III (11)
+      const targetRank = rankOrder[Math.min(targetIndex, rankOrder.length - 1)];
+      currentRankIndex = targetIndex;
+      lifetime = targetRank.need + Math.floor(Math.random() * 5000);
+      score = Math.max(0, score - Math.floor(score * 0.5));
+      showPopup("YOU LOSE THE CLICKOFF<br><br>" + excuse + "<br><br>New rank now: " + targetRank.name);
+      log("Lose the Diamond clickoff. Get robbed and send back to " + targetRank.name + ". " + excuse, true);
+    } else {
+      lifetime = rankOrder[currentRankIndex].need + Math.floor(Math.random() * 300);
+      const stolen = Math.floor(score * 0.3);
+      score = Math.max(0, score - stolen);
+      showPopup("YOU LOSE THE CLICKOFF<br><br>" + excuse + "<br><br>Lose " + stolen + " MMR. Still " + rankOrder[currentRankIndex].name + ".");
+      log("Lose the clickoff for " + rankOrder[battleTargetIndex].name + ". " + excuse, true);
+    }
+  }
+
+  inBattle = false;
+  paused = false;
+  updateUI();
+}
+
+function triggerSoulSellEnding() {
+  gameEnded = true;
+  inBattle = false;
+  stopBackgroundLoop();
+  document.getElementById('endingIcon').src = saveIcon('diamond-1');
+  document.getElementById('endingText').innerText =
+    "The bandit see your auto-grinder army and know he cannot win no more. He offer different deal: your soul, sign over on contract wrote on back of a napkin, for exchange of Diamond I, forever, is guarantee, no more clickoff. You sign it. The bandit drive off satisfy. You are now Diamond I. You are also, by contract, no longer having your soul. Total MMR farm: " + Math.floor(lifetime) + ". Total time you get rob along the way: " + betrayals + ".";
+  document.getElementById('endingScreen').style.display = 'block';
+}
+
+function clickRank() {
+  if (paused || gameEnded) return;
+  score += perClick;
+  lifetime += perClick;
+  totalClicks++;
+
+  playMetalHit();
+  bounceIcon();
+
+  if (Math.random() < 0.02 && totalClicks > 5) {
+    const stolen = Math.floor(score * 0.15);
+    score = Math.max(0, score - stolen);
+    log("A pickpocket lurk in the lobby and swipe " + stolen + " MMR off from your profile.", true);
+  }
+
+  checkRankProgress();
+  updateUI();
+}
+
+function bounceIcon() {
+  const img = document.getElementById('diamondBtn');
+  img.style.transform = 'scale(0.82) rotate(-8deg)';
+  setTimeout(() => { img.style.transform = ''; }, 90);
+}
+
+/* ---------------- AUDIO ENGINE ---------------- */
+let audioCtx = null;
+let musicStarted = false;
+
+function ensureAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (!musicStarted) {
+    musicStarted = true;
+    startBackgroundLoop();
+  }
+}
+
+function playTone(freq, dur, type, vol, when) {
+  if (!audioCtx) return;
+  const t0 = when || audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type || 'square';
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.linearRampToValueAtTime(vol || 0.05, t0 + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(t0);
+  osc.stop(t0 + dur + 0.02);
+}
+
+function playBoom() {
+  if (!audioCtx) return;
+  const t0 = audioCtx.currentTime;
+
+  const osc = audioCtx.createOscillator();
+  const oscGain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(160, t0);
+  osc.frequency.exponentialRampToValueAtTime(40, t0 + 0.35);
+  oscGain.gain.setValueAtTime(0.5, t0);
+  oscGain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.4);
+  osc.connect(oscGain);
+  oscGain.connect(audioCtx.destination);
+  osc.start(t0);
+  osc.stop(t0 + 0.42);
+
+  const bufferSize = audioCtx.sampleRate * 0.3;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+  }
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buffer;
+  const lp = audioCtx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 500;
+  const noiseGain = audioCtx.createGain();
+  noiseGain.gain.setValueAtTime(0.4, t0);
+  noiseGain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.3);
+  noise.connect(lp);
+  lp.connect(noiseGain);
+  noiseGain.connect(audioCtx.destination);
+  noise.start(t0);
+}
+
+/* loud, dumb theme for the bandit clickoff */
+const BANDIT_MELODY = [
+  110, 110, 165, 110, 130, 110, 165, 196,
+  110, 110, 165, 110, 146, 130, 110, 0,
+];
+const BANDIT_NOTE_MS = 200;
+let banditIndex = 0;
+let banditTimer = null;
+
+function startBanditSong() {
+  if (banditTimer) return;
+  banditIndex = 0;
+  banditTimer = setInterval(() => {
+    const freq = BANDIT_MELODY[banditIndex % BANDIT_MELODY.length];
+    if (freq > 0) playTone(freq, BANDIT_NOTE_MS / 1000 * 0.9, 'square', 0.09);
+    if (banditIndex % 4 === 0) playTone(freq / 2, BANDIT_NOTE_MS / 1000 * 0.9, 'sawtooth', 0.06);
+    banditIndex++;
+  }, BANDIT_NOTE_MS);
+}
+
+function stopBanditSong() {
+  if (banditTimer) { clearInterval(banditTimer); banditTimer = null; }
+  if (!gameEnded) startBackgroundLoop();
+}
+
+function playMetalHit() {
+  if (!audioCtx) return;
+  const t0 = audioCtx.currentTime;
+  const bufferSize = audioCtx.sampleRate * 0.12;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 3);
+  }
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buffer;
+  const bp = audioCtx.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = 2200;
+  bp.Q.value = 6;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.35, t0);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.15);
+  noise.connect(bp);
+  bp.connect(gain);
+  gain.connect(audioCtx.destination);
+  noise.start(t0);
+
+  playTone(1600, 0.1, 'square', 0.05, t0);
+  playTone(950, 0.12, 'square', 0.04, t0 + 0.01);
+}
+
+// dumb little looping theme, plays forever in the background
+const BG_MELODY = [
+  523, 659, 784, 659, 523, 392, 523, 0,
+  494, 622, 740, 622, 494, 370, 494, 0,
+];
+const BG_NOTE_MS = 220;
+let bgIndex = 0;
+let bgTimer = null;
+
+function startBackgroundLoop() {
+  if (bgTimer) return;
+  bgTimer = setInterval(() => {
+    const freq = BG_MELODY[bgIndex % BG_MELODY.length];
+    if (freq > 0) playTone(freq, BG_NOTE_MS / 1000 * 0.9, 'square', 0.025);
+    bgIndex++;
+  }, BG_NOTE_MS);
+}
+
+function stopBackgroundLoop() {
+  if (bgTimer) { clearInterval(bgTimer); bgTimer = null; }
+}
+
+document.addEventListener('click', ensureAudio, { once: false });
+
+/* ---------------- CAR CONTROL SHOWDOWN (4K rhythm battle) ---------------- */
+const LANE_KEYS = {
+  0: ['ArrowLeft', 'a', 'A'],
+  1: ['ArrowUp', 'w', 'W'],
+  2: ['ArrowDown', 's', 'S'],
+  3: ['ArrowRight', 'd', 'D'],
+};
+const LANE_FREQ = [220, 277, 330, 392];
+
+let rhythmActive = false;
+let rhythmTargetIndex = -1;
+let rhythmNotes = [];
+let rhythmHits = 0;
+let rhythmTotalNotes = 0;
+let rhythmKeyHandler = null;
+let rhythmStartTime = 0;
+const RHYTHM_TRAVEL_MS = 1800;
+const RHYTHM_HIT_WINDOW = 200;
+
+function buildRhythmPattern(difficulty) {
+  const base = [0,1,2,3,0,2,1,3,0,1,2,3,3,2,1,0];
+  const extra = difficulty > 1 ? [1,2,0,3,2,1,3,0] : [];
+  return base.concat(extra);
+}
+
+function openRhythmBattle(targetIndex) {
+  inBattle = true;
+  paused = true;
+  stopBackgroundLoop();
+  rhythmTargetIndex = targetIndex;
+  rhythmHits = 0;
+  rhythmNotes = [];
+  document.getElementById('highway').innerHTML =
+    '<div class="lane"><div class="hitzone" id="hz0">DRIFT<br>LEFT</div></div>' +
+    '<div class="lane"><div class="hitzone" id="hz1">BOOST</div></div>' +
+    '<div class="lane"><div class="hitzone" id="hz2">BRAKE</div></div>' +
+    '<div class="lane"><div class="hitzone" id="hz3">DRIFT<br>RIGHT</div></div>';
+  document.getElementById('rhythmTitle').innerText = 'CAR CONTROL SHOWDOWN -- ' + rankOrder[targetIndex].name;
+  document.getElementById('rhythmSub').innerText = 'A crappy little tune is play. Hit DRIFT LEFT / BOOST / BRAKE / DRIFT RIGHT in time (arrow key or WASD) for hold your line.';
+  document.getElementById('rhythmHits').innerText = '0';
+  document.getElementById('rhythmTotal').innerText = '0';
+  document.getElementById('rhythmStartBtn').style.display = 'inline-block';
+  document.getElementById('rhythmPopup').style.display = 'block';
+}
+
+function startRhythmBattle() {
+  ensureAudio();
+  document.getElementById('rhythmStartBtn').style.display = 'none';
+  const tier = Math.floor(rhythmTargetIndex / 3);
+  const pattern = buildRhythmPattern(tier);
+  rhythmTotalNotes = pattern.length;
+  document.getElementById('rhythmTotal').innerText = rhythmTotalNotes;
+  rhythmActive = true;
+  rhythmStartTime = performance.now();
+
+  const beatMs = Math.max(260, 420 - tier * 20);
+  const highway = document.getElementById('highway');
+
+  pattern.forEach((lane, i) => {
+    const spawnDelay = i * beatMs;
+    setTimeout(() => {
+      if (!rhythmActive) return;
+      const note = document.createElement('div');
+      note.className = 'note lane' + lane;
+      note.style.left = (lane * 90 + 5) + 'px';
+      note.style.transition = 'top ' + RHYTHM_TRAVEL_MS + 'ms linear';
+      highway.appendChild(note);
+      requestAnimationFrame(() => { note.style.top = '246px'; });
+
+      const hitTime = performance.now() + RHYTHM_TRAVEL_MS;
+      const noteObj = { lane, el: note, hitTime, resolved: false };
+      rhythmNotes.push(noteObj);
+
+      if (audioCtx) playTone(LANE_FREQ[lane], 0.15, 'triangle', 0.05, audioCtx.currentTime + RHYTHM_TRAVEL_MS / 1000);
+
+      setTimeout(() => {
+        if (!noteObj.resolved) {
+          noteObj.resolved = true;
+          playMissBuzz();
+          note.remove();
+        }
+      }, RHYTHM_TRAVEL_MS + RHYTHM_HIT_WINDOW + 50);
+    }, spawnDelay);
+  });
+
+  rhythmKeyHandler = (e) => {
+    let lane = -1;
+    for (const l in LANE_KEYS) {
+      if (LANE_KEYS[l].includes(e.key)) { lane = parseInt(l); break; }
+    }
+    if (lane === -1) return;
+    e.preventDefault();
+    const zone = document.getElementById('hz' + lane);
+    zone.classList.add('active');
+    setTimeout(() => zone.classList.remove('active'), 100);
+
+    playLaneAction(lane);
+
+    const now = performance.now();
+    let best = null;
+    for (const n of rhythmNotes) {
+      if (n.resolved || n.lane !== lane) continue;
+      if (Math.abs(n.hitTime - now) < RHYTHM_HIT_WINDOW) {
+        if (!best || Math.abs(n.hitTime - now) < Math.abs(best.hitTime - now)) best = n;
+      }
+    }
+    if (best) {
+      best.resolved = true;
+      rhythmHits++;
+      document.getElementById('rhythmHits').innerText = rhythmHits;
+      best.el.style.background = '#FFFFFF';
+      playHitDing();
+      best.el.remove();
+    }
+  };
+  document.addEventListener('keydown', rhythmKeyHandler);
+
+  startBattleSong();
+
+  const totalDuration = pattern.length * beatMs + RHYTHM_TRAVEL_MS + 400;
+  setTimeout(resolveRhythmBattle, totalDuration);
+}
+
+function resolveRhythmBattle() {
+  rhythmActive = false;
+  document.removeEventListener('keydown', rhythmKeyHandler);
+  document.getElementById('rhythmPopup').style.display = 'none';
+  stopBattleSong();
+
+  const ratio = rhythmTotalNotes > 0 ? rhythmHits / rhythmTotalNotes : 0;
+  const won = godMode || (ratio >= 0.55);
+
+  if (won) {
+    currentRankIndex = rhythmTargetIndex;
+    rankUps++;
+    log("You nail the car control showdown (" + rhythmHits + "/" + rhythmTotalNotes + "). Rank up to " + rankOrder[currentRankIndex].name + ".");
+    showPopup("CLEAN LINE<br><br>You hold the car together through whole song. New rank: " + rankOrder[currentRankIndex].name);
+  } else {
+    betrayals++;
+    const excuse = robExcuses[Math.floor(Math.random() * robExcuses.length)];
+    lifetime = rankOrder[currentRankIndex].need + Math.floor(Math.random() * 300);
+    const stolen = Math.floor(score * 0.3);
+    score = Math.max(0, score - stolen);
+    showPopup("YOU SPIN OUT<br><br>You miss too many control (" + rhythmHits + "/" + rhythmTotalNotes + "). " + excuse + "<br><br>Lose " + stolen + " MMR. Still " + rankOrder[currentRankIndex].name + ".");
+    log("Spin out during the showdown for " + rankOrder[rhythmTargetIndex].name + ". " + excuse, true);
+  }
+
+  inBattle = false;
+  paused = false;
+  updateUI();
+}
+
+/* ---------------- rhythm battle sound effects ---------------- */
+function playHitDing() {
+  if (!audioCtx) return;
+  const t0 = audioCtx.currentTime;
+  playTone(1400, 0.08, 'triangle', 0.07, t0);
+  playTone(1866, 0.08, 'triangle', 0.05, t0 + 0.02);
+}
+
+function playMissBuzz() {
+  if (!audioCtx) return;
+  const t0 = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(160, t0);
+  osc.frequency.linearRampToValueAtTime(80, t0 + 0.15);
+  gain.gain.setValueAtTime(0.06, t0);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.18);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(t0);
+  osc.stop(t0 + 0.2);
+}
+
+function playDriftSound() {
+  if (!audioCtx) return;
+  const t0 = audioCtx.currentTime;
+  const bufferSize = audioCtx.sampleRate * 0.25;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+  }
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buffer;
+  const filt = audioCtx.createBiquadFilter();
+  filt.type = 'bandpass';
+  filt.frequency.setValueAtTime(1800, t0);
+  filt.frequency.linearRampToValueAtTime(500, t0 + 0.25);
+  filt.Q.value = 8;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.18, t0);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.25);
+  noise.connect(filt);
+  filt.connect(gain);
+  gain.connect(audioCtx.destination);
+  noise.start(t0);
+}
+
+function playBoostSound() {
+  if (!audioCtx) return;
+  const t0 = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(120, t0);
+  osc.frequency.exponentialRampToValueAtTime(900, t0 + 0.22);
+  gain.gain.setValueAtTime(0.001, t0);
+  gain.gain.linearRampToValueAtTime(0.08, t0 + 0.05);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.24);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(t0);
+  osc.stop(t0 + 0.25);
+}
+
+function playBrakeSound() {
+  if (!audioCtx) return;
+  const t0 = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(90, t0);
+  gain.gain.setValueAtTime(0.12, t0);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0 + 0.1);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(t0);
+  osc.stop(t0 + 0.12);
+}
+
+function playLaneAction(lane) {
+  if (lane === 0 || lane === 3) playDriftSound();
+  else if (lane === 1) playBoostSound();
+  else if (lane === 2) playBrakeSound();
+}
+
+/* dumb little tune that plays specifically during the car control showdown */
+const BATTLE_MELODY = [
+  196, 196, 233, 196, 175, 196, 233, 261,
+  196, 196, 233, 196, 220, 196, 175, 0,
+];
+const BATTLE_NOTE_MS = 240;
+let battleIndex = 0;
+let battleTimer = null;
+
+function startBattleSong() {
+  if (battleTimer) return;
+  battleIndex = 0;
+  battleTimer = setInterval(() => {
+    const freq = BATTLE_MELODY[battleIndex % BATTLE_MELODY.length];
+    if (freq > 0) playTone(freq, BATTLE_NOTE_MS / 1000 * 0.85, 'sawtooth', 0.03);
+    battleIndex++;
+  }, BATTLE_NOTE_MS);
+}
+
+function stopBattleSong() {
+  if (battleTimer) { clearInterval(battleTimer); battleTimer = null; }
+  if (!gameEnded) startBackgroundLoop();
+}
+
+function buyClickTrainer(id) {
+  if (paused || gameEnded) return;
+  const u = clickTrainers.find(x => x.id === id);
+  const cost = costFor(u.baseCost, u.owned);
+  if (score < cost) { log("You not have enough MMR.", true); return; }
+  score -= cost;
+  u.owned++;
+  perClick += u.addPerClick;
+  log("You buy " + u.name + ". +" + u.addPerClick + " MMR for each click now.");
+  updateUI();
+}
+
+function buyAutoGrinder(id) {
+  if (paused || gameEnded) return;
+  const g = autoGrinders.find(x => x.id === id);
+  const cost = costFor(g.baseCost, g.owned);
+  if (score < cost) { log("You not have enough MMR.", true); return; }
+  score -= cost;
+  g.owned++;
+  log("You buy " + g.name + ". +" + g.output + " MMR for each sec now.");
+  updateUI();
+}
+
+function buyMisc(id) {
+  if (paused || gameEnded) return;
+  const m = miscUpgrades.find(x => x.id === id);
+  const cost = costFor(m.baseCost, m.owned);
+  if (score < cost) { log("You not have enough MMR.", true); return; }
+  score -= cost;
+  m.owned++;
+  log("You buy " + m.name + ". It do nothing.");
+  updateUI();
+}
+
+setInterval(() => {
+  if (!paused && !gameEnded) {
+    const ps = getPerSec();
+    if (ps > 0) {
+      score += ps;
+      lifetime += ps;
+      checkRankProgress();
+      updateUI();
+    }
+  }
+}, 1000);
+
+/* ---------------- DEV MODE ---------------- */
+const DEV_PASSWORD = "iddqd";
+let godMode = false;
+
+function toggleDevBox() {
+  const box = document.getElementById('devBox');
+  box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
+}
+
+function tryDevUnlock() {
+  const val = document.getElementById('devPassInput').value;
+  if (val === DEV_PASSWORD) {
+    document.getElementById('devLockedArea').style.display = 'none';
+    document.getElementById('devUnlockedArea').style.display = 'block';
+    populateDevRankSelect();
+  } else {
+    document.getElementById('devPassMsg').innerText = 'that is not correct code';
+  }
+}
+
+function populateDevRankSelect() {
+  const sel = document.getElementById('devRankSelect');
+  sel.innerHTML = '';
+  rankOrder.forEach((r, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.innerText = r.name;
+    sel.appendChild(opt);
+  });
+  sel.value = currentRankIndex;
+}
+
+function devApplyScore() {
+  const v = parseFloat(document.getElementById('devSetScore').value);
+  if (!isNaN(v)) { score = v; updateUI(); }
+}
+
+function devApplyLifetime() {
+  const v = parseFloat(document.getElementById('devSetLifetime').value);
+  if (!isNaN(v)) {
+    lifetime = v;
+    for (let i = rankOrder.length - 1; i >= 0; i--) {
+      if (lifetime >= rankOrder[i].need) { currentRankIndex = i; break; }
+    }
+    updateUI();
+  }
+}
+
+function devApplyRank() {
+  const idx = parseInt(document.getElementById('devRankSelect').value);
+  currentRankIndex = idx;
+  lifetime = Math.max(lifetime, rankOrder[idx].need);
+  updateUI();
+}
+
+function devToggleGod() {
+  godMode = document.getElementById('devGodMode').checked;
+}
+
+function devMaxGrinders() {
+  autoGrinders.forEach(g => { g.owned += 100; });
+  updateUI();
+}
+
+function devMaxClickers() {
+  clickTrainers.forEach(u => {
+    u.owned += 20;
+    perClick += u.addPerClick * 20;
+  });
+  updateUI();
+}
+
+/* ---------------- SAVE / LOAD (localStorage) ---------------- */
+const SAVE_KEY = 'rankClimberSaveV1';
+
+function saveGame() {
+  try {
+    const state = {
+      score, lifetime, totalClicks, perClick, rankUps, betrayals, currentRankIndex, gameEnded,
+      clickTrainers: clickTrainers.map(u => u.owned),
+      autoGrinders: autoGrinders.map(g => g.owned),
+      miscUpgrades: miscUpgrades.map(m => m.owned),
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+  } catch (e) { /* storage not available, just skip, game still work fine */ }
+}
+
+function loadGame() {
+  let raw = null;
+  try { raw = localStorage.getItem(SAVE_KEY); } catch (e) { raw = null; }
+  if (!raw) return;
+  try {
+    const state = JSON.parse(raw);
+    score = state.score || 0;
+    lifetime = state.lifetime || 0;
+    totalClicks = state.totalClicks || 0;
+    perClick = state.perClick || 1;
+    rankUps = state.rankUps || 0;
+    betrayals = state.betrayals || 0;
+    currentRankIndex = state.currentRankIndex || 0;
+    gameEnded = !!state.gameEnded;
+
+    if (Array.isArray(state.clickTrainers)) {
+      state.clickTrainers.forEach((v, i) => { if (clickTrainers[i]) clickTrainers[i].owned = v; });
+    }
+    if (Array.isArray(state.autoGrinders)) {
+      state.autoGrinders.forEach((v, i) => { if (autoGrinders[i]) autoGrinders[i].owned = v; });
+    }
+    if (Array.isArray(state.miscUpgrades)) {
+      state.miscUpgrades.forEach((v, i) => { if (miscUpgrades[i]) miscUpgrades[i].owned = v; });
+    }
+
+    log("Old save is load. Welcome back. Your progress from before is still here.");
+
+    if (gameEnded) {
+      document.getElementById('endingIcon').src = saveIcon('diamond-1');
+      document.getElementById('endingText').innerText =
+        "This game already finish on your last visit. Total MMR farm: " + Math.floor(lifetime) +
+        ". Total time you get rob along the way: " + betrayals + ". Press NEW GAME + for start over.";
+      document.getElementById('endingScreen').style.display = 'block';
+      paused = true;
+    }
+  } catch (e) { /* bad save data, just start fresh */ }
+}
+
+function resetSave() {
+  try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+  location.reload();
+}
+
+loadGame();
+updateUI();
+window.addEventListener('beforeunload', saveGame);
+</script>
+
+</body>
+</html>
