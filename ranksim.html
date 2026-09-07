@@ -470,6 +470,7 @@ let perClick = 1;
 let rankUps = 0;
 let betrayals = 0;
 let currentRankIndex = 0;
+let maxRankAchieved = 0; // highest rank actually earned via a battle -- getting robbed back below this never requires a rematch
 let paused = false;
 let gameEnded = false;
 
@@ -623,6 +624,13 @@ function closePopup() {
 function checkRankProgress() {
   if (inBattle || paused || gameEnded) return;
 
+  // fast-forward through any ranks you already proved you can hold -- no rematch needed
+  while (currentRankIndex + 1 < rankOrder.length &&
+         currentRankIndex + 1 <= maxRankAchieved &&
+         lifetime >= rankOrder[currentRankIndex + 1].need) {
+    currentRankIndex++;
+  }
+
   if (currentRankIndex + 1 < rankOrder.length && lifetime >= rankOrder[currentRankIndex + 1].need) {
     const targetIndex = currentRankIndex + 1;
     if (targetIndex % 3 === 0) {
@@ -735,6 +743,7 @@ function resolveBattle() {
 
   if (won) {
     currentRankIndex = battleTargetIndex;
+    maxRankAchieved = Math.max(maxRankAchieved, currentRankIndex);
     rankUps++;
     log("You beat the bandit at clickoff. Rank up to " + rankOrder[currentRankIndex].name + ".");
     showPopup("YOU WIN THE CLICKOFF<br><br>The bandit speed off with empty hand. New rank: " + rankOrder[currentRankIndex].name);
@@ -1076,6 +1085,7 @@ function resolveRhythmBattle() {
 
   if (won) {
     currentRankIndex = rhythmTargetIndex;
+    maxRankAchieved = Math.max(maxRankAchieved, currentRankIndex);
     rankUps++;
     log("You nail the car control showdown (" + rhythmHits + "/" + rhythmTotalNotes + "). Rank up to " + rankOrder[currentRankIndex].name + ".");
     showPopup("CLEAN LINE<br><br>You hold the car together through whole song. New rank: " + rankOrder[currentRankIndex].name);
@@ -1295,6 +1305,7 @@ function devApplyLifetime() {
     for (let i = rankOrder.length - 1; i >= 0; i--) {
       if (lifetime >= rankOrder[i].need) { currentRankIndex = i; break; }
     }
+    maxRankAchieved = Math.max(maxRankAchieved, currentRankIndex);
     updateUI();
   }
 }
@@ -1303,6 +1314,7 @@ function devApplyRank() {
   const idx = parseInt(document.getElementById('devRankSelect').value);
   currentRankIndex = idx;
   lifetime = Math.max(lifetime, rankOrder[idx].need);
+  maxRankAchieved = Math.max(maxRankAchieved, currentRankIndex);
   updateUI();
 }
 
@@ -1329,7 +1341,7 @@ const SAVE_KEY = 'rankClimberSaveV1';
 function saveGame() {
   try {
     const state = {
-      score, lifetime, totalClicks, perClick, rankUps, betrayals, currentRankIndex, gameEnded,
+      score, lifetime, totalClicks, perClick, rankUps, betrayals, currentRankIndex, maxRankAchieved, gameEnded,
       clickTrainers: clickTrainers.map(u => u.owned),
       autoGrinders: autoGrinders.map(g => g.owned),
       miscUpgrades: miscUpgrades.map(m => m.owned),
@@ -1351,6 +1363,10 @@ function loadGame() {
     rankUps = state.rankUps || 0;
     betrayals = state.betrayals || 0;
     currentRankIndex = state.currentRankIndex || 0;
+    // old saves from before this fix don't have maxRankAchieved -- treat
+    // whatever rank you were already sitting at as "proven" so you are
+    // never forced to rematch for ground you already covered
+    maxRankAchieved = (typeof state.maxRankAchieved === 'number') ? state.maxRankAchieved : currentRankIndex;
     gameEnded = !!state.gameEnded;
 
     if (Array.isArray(state.clickTrainers)) {
