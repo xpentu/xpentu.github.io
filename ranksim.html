@@ -325,6 +325,7 @@
   <div id="rankName">BRONZE I</div>
   <div id="progressOuter"><div id="progressInner"></div></div>
   <div style="font-size:12px; color:#CCCCCC;"><span id="mmrCurrent">0</span> / <span id="mmrNeeded">50</span> MMR for go next rank</div>
+  <div style="font-size:11px; color:#FF8888;" id="diamondCooldownLine"></div>
 
   <div id="score">MMR: 0</div>
   <br>
@@ -471,6 +472,7 @@ let rankUps = 0;
 let betrayals = 0;
 let currentRankIndex = 0;
 let maxRankAchieved = 0; // highest rank actually earned via a battle -- getting robbed back below this never requires a rematch
+let diamondCooldown = 0; // seconds before the diamond bandit is allowed to show up again after a loss
 let paused = false;
 let gameEnded = false;
 
@@ -600,6 +602,9 @@ function updateUI() {
   document.getElementById('progressInner').style.width = pct + '%';
   document.getElementById('mmrCurrent').innerText = Math.floor(into);
   document.getElementById('mmrNeeded').innerText = Math.floor(span);
+  document.getElementById('diamondCooldownLine').innerText = diamondCooldown > 0
+    ? ('bandit is lay low for ' + diamondCooldown + 's before he try take diamond from you again')
+    : '';
 
   renderShop();
   saveGame();
@@ -643,7 +648,7 @@ function checkRankProgress() {
     return;
   }
 
-  if (currentRankIndex === rankOrder.length - 1 && lifetime >= DIAMOND_THRESHOLD) {
+  if (currentRankIndex === rankOrder.length - 1 && lifetime >= DIAMOND_THRESHOLD && diamondCooldown <= 0) {
     openBattle(-1, true);
     return;
   }
@@ -668,9 +673,9 @@ function openBattle(targetIndex, isDiamond) {
   document.getElementById('clickBattleBtn').style.display = 'none';
   document.getElementById('battleStartBtn').style.display = 'block';
 
-  const assistCount = getAutoClickerCount();
-  document.getElementById('autoAssistLine').innerText = assistCount > 0
-    ? ('+' + assistCount + ' auto-grinders piling on too')
+  const assistPerTick = Math.floor(getPerSec() * 0.5 + perClick * 5);
+  document.getElementById('autoAssistLine').innerText = assistPerTick > 0
+    ? ('+' + assistPerTick + ' MMR/sec from your own auto-grinder and click training is helping too')
     : '';
 
   if (isDiamond) {
@@ -684,7 +689,10 @@ function openBattle(targetIndex, isDiamond) {
   } else {
     document.getElementById('battleTitle').innerText = 'BANDIT CHALLENGE';
     document.getElementById('battleIntro').innerText = 'A bandit pull up with shiny car and challenge you for clickoff of ' + rankOrder[targetIndex].name + '.';
-    banditTarget = 8 + targetIndex * 2;
+    // target scale with the actual MMR gap you are jumping, so your real
+    // click power and production both matter here, not some flat number
+    const gap = rankOrder[targetIndex].need - rankOrder[currentRankIndex].need;
+    banditTarget = Math.max(20, Math.floor(gap * 0.02));
   }
 
   document.getElementById('battlePopup').style.display = 'block';
@@ -700,8 +708,8 @@ function startBattle() {
     battleTimeLeft--;
     document.getElementById('battleTimer').innerText = battleTimeLeft + 's left';
 
-    // your owned auto-grinders pitch in and click for you too
-    const assist = Math.floor(getAutoClickerCount() * 0.4);
+    // your actual auto-grinder production AND click training both pitch in here
+    const assist = Math.floor(getPerSec() * 0.5 + perClick * 5);
     if (assist > 0) {
       playerBattleScore += assist;
       document.getElementById('playerScore').innerText = playerBattleScore;
@@ -719,7 +727,7 @@ function startBattle() {
 
 function battleClick() {
   if (battleTimeLeft <= 0) return;
-  playerBattleScore++;
+  playerBattleScore += perClick;
   document.getElementById('playerScore').innerText = playerBattleScore;
   playBoom();
 }
@@ -756,9 +764,10 @@ function resolveBattle() {
       const targetRank = rankOrder[Math.min(targetIndex, rankOrder.length - 1)];
       currentRankIndex = targetIndex;
       lifetime = targetRank.need + Math.floor(Math.random() * 5000);
-      score = Math.max(0, score - Math.floor(score * 0.5));
-      showPopup("YOU LOSE THE CLICKOFF<br><br>" + excuse + "<br><br>New rank now: " + targetRank.name);
-      log("Lose the Diamond clickoff. Get robbed and send back to " + targetRank.name + ". " + excuse, true);
+      score = Math.max(0, score - Math.floor(score * 0.25));
+      diamondCooldown = 45;
+      showPopup("YOU LOSE THE CLICKOFF<br><br>" + excuse + "<br><br>New rank now: " + targetRank.name + "<br><br>The bandit need some time before he dare come back. He is gone for a bit (about 45 second) -- keep grinding, he will be weaker to argue with next time if you build up more auto-grinder.");
+      log("Lose the Diamond clickoff. Get robbed and send back to " + targetRank.name + ". " + excuse + " Bandit is gone for 45s.", true);
     } else {
       lifetime = rankOrder[currentRankIndex].need + Math.floor(Math.random() * 300);
       const stolen = Math.floor(score * 0.3);
@@ -1250,7 +1259,12 @@ function buyMisc(id) {
 }
 
 setInterval(() => {
-  if (!paused && !gameEnded) {
+  if (gameEnded) return;
+  if (diamondCooldown > 0) {
+    diamondCooldown = Math.max(0, diamondCooldown - 1);
+    updateUI();
+  }
+  if (!paused) {
     const ps = getPerSec();
     if (ps > 0) {
       score += ps;
@@ -1341,7 +1355,7 @@ const SAVE_KEY = 'rankClimberSaveV1';
 function saveGame() {
   try {
     const state = {
-      score, lifetime, totalClicks, perClick, rankUps, betrayals, currentRankIndex, maxRankAchieved, gameEnded,
+      score, lifetime, totalClicks, perClick, rankUps, betrayals, currentRankIndex, maxRankAchieved, diamondCooldown, gameEnded,
       clickTrainers: clickTrainers.map(u => u.owned),
       autoGrinders: autoGrinders.map(g => g.owned),
       miscUpgrades: miscUpgrades.map(m => m.owned),
@@ -1367,6 +1381,7 @@ function loadGame() {
     // whatever rank you were already sitting at as "proven" so you are
     // never forced to rematch for ground you already covered
     maxRankAchieved = (typeof state.maxRankAchieved === 'number') ? state.maxRankAchieved : currentRankIndex;
+    diamondCooldown = (typeof state.diamondCooldown === 'number') ? state.diamondCooldown : 0;
     gameEnded = !!state.gameEnded;
 
     if (Array.isArray(state.clickTrainers)) {
